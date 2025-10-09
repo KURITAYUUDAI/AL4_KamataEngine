@@ -16,64 +16,115 @@
     <Filter Include="シェーダー ファイル">
       <UniqueIdentifier>{718c7f4c-fc51-40ad-a221-b9456a7a1a3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\application">
+      <UniqueIdentifier>{517cf913-811a-451f-8f98-c644b0073a4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine">
+      <UniqueIdentifier>{76e17fb3-1457-42f5-a807-d55c911926a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine">
+      <UniqueIdentifier>{d1fc5c85-68cf-4234-bd53-6a3b20d1af01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\application">
+      <UniqueIdentifier>{1f30efd0-7429-42ea-8440-001ab108716e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\application\player">
+      <UniqueIdentifier>{bd629b0b-757b-466c-a1e5-faf3c1484aae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\application\non-player">
+      <UniqueIdentifier>{c06fe46d-5567-4ebe-b71c-3a641ac07231}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\application\stage">
+      <UniqueIdentifier>{ec1e0b26-3938-4c2b-9d5f-f12abd102d8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\application\scene">
+      <UniqueIdentifier>{124ba943-f2c7-4427-adc8-857c59756c53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\application\camera">
+      <UniqueIdentifier>{540078eb-6166-4234-a39e-4ad40b1c53fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\math">
+      <UniqueIdentifier>{6a89facf-f403-4b42-a81c-52bca729037c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\random">
+      <UniqueIdentifier>{d8e9abfe-35cb-441a-ae3a-4b77f88a5239}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine\math">
+      <UniqueIdentifier>{db5abd16-cdd2-4a8a-abab-4df4ff3f4373}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine\random">
+      <UniqueIdentifier>{627e7e89-b07b-4967-9967-e0d75534b4c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\application\player">
+      <UniqueIdentifier>{e5661f43-e11f-47e3-bdd5-64d986902f6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\application\non-plyaer">
+      <UniqueIdentifier>{742bd5c5-18ff-4ec7-85e3-298541f8e6fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\application\stage">
+      <UniqueIdentifier>{6ae77942-607b-4e0d-95f3-a6b42cf7cc1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\application\scene">
+      <UniqueIdentifier>{ced29966-e819-44a6-9fea-24de71785249}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\application\camera">
+      <UniqueIdentifier>{0a8d005f-c9fb-4f18-9e23-dc93572ba5db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="apprication\GameScene.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="application\player\AimCursor.cpp">
+      <Filter>ソース ファイル\application\player</Filter>
     </ClCompile>
-    <ClCompile Include="apprication\Player.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="application\player\Anchor.cpp">
+      <Filter>ソース ファイル\application\player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\player\Player.cpp">
+      <Filter>ソース ファイル\application\player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\stage\BackGround.cpp">
+      <Filter>ソース ファイル\application\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\GameScene.cpp">
+      <Filter>ソース ファイル\application\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\non-player\Enemy.cpp">
+      <Filter>ソース ファイル\application\non-player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\camera\Fade.cpp">
+      <Filter>ソース ファイル\application\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="application\player\Wire.cpp">
+      <Filter>ソース ファイル\application\player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\TitleScene.cpp">
+      <Filter>ソース ファイル\application\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\stage\Skydome.cpp">
+      <Filter>ソース ファイル\application\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\stage\MapChipField.cpp">
+      <Filter>ソース ファイル\application\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\non-player\HitEffect.cpp">
+      <Filter>ソース ファイル\application\non-player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\player\DeathParticles.cpp">
+      <Filter>ソース ファイル\application\player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\camera\CameraController.cpp">
+      <Filter>ソース ファイル\application\camera</Filter>
     </ClCompile>
     <ClCompile Include="engine\math\myMath.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\Skydome.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\MyWorldMath.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\MapChipField.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\CameraController.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\Enemy.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\DeathParticles.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\TitleScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\Fade.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\HitEffect.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\engine\math</Filter>
     </ClCompile>
     <ClCompile Include="engine\random\RandomEngine.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\engine\random</Filter>
     </ClCompile>
-    <ClCompile Include="apprication\Anchor.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\AimCursor.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\Wire.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\Goal.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="apprication\BackGround.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="application\non-player\Goal.cpp">
+      <Filter>ソース ファイル\application\non-player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -127,59 +178,56 @@
     <None Include=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="apprication\GameScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="apprication\Player.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="engine\math\myMath.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="apprication\Skydome.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="apprication\MyWorldMath.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="apprication\MapChipField.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="apprication\CameraController.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="apprication\Enemy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="apprication\DeathParticles.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="apprication\TitleScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="apprication\Fade.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="apprication\HitEffect.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\engine\math</Filter>
     </ClInclude>
     <ClInclude Include="engine\random\RandomEngine.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\engine\random</Filter>
     </ClInclude>
-    <ClInclude Include="apprication\Anchor.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="application\player\AimCursor.h">
+      <Filter>ヘッダー ファイル\application\player</Filter>
     </ClInclude>
-    <ClInclude Include="apprication\AimCursor.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="application\player\Anchor.h">
+      <Filter>ヘッダー ファイル\application\player</Filter>
     </ClInclude>
-    <ClInclude Include="apprication\Wire.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="application\stage\BackGround.h">
+      <Filter>ヘッダー ファイル\application\stage</Filter>
     </ClInclude>
-    <ClInclude Include="apprication\Goal.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="application\camera\CameraController.h">
+      <Filter>ヘッダー ファイル\application\camera</Filter>
     </ClInclude>
-    <ClInclude Include="apprication\BackGround.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="application\player\DeathParticles.h">
+      <Filter>ヘッダー ファイル\application\player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\non-player\Enemy.h">
+      <Filter>ヘッダー ファイル\application\non-plyaer</Filter>
+    </ClInclude>
+    <ClInclude Include="application\camera\Fade.h">
+      <Filter>ヘッダー ファイル\application\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\GameScene.h">
+      <Filter>ヘッダー ファイル\application\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\non-player\Goal.h">
+      <Filter>ヘッダー ファイル\application\non-plyaer</Filter>
+    </ClInclude>
+    <ClInclude Include="application\non-player\HitEffect.h">
+      <Filter>ヘッダー ファイル\application\non-plyaer</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\MapChipField.h">
+      <Filter>ヘッダー ファイル\application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\player\Player.h">
+      <Filter>ヘッダー ファイル\application\player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\stage\Skydome.h">
+      <Filter>ヘッダー ファイル\application\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\TitleScene.h">
+      <Filter>ヘッダー ファイル\application\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\player\Wire.h">
+      <Filter>ヘッダー ファイル\application\player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
