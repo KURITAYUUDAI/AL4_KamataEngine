@@ -30,7 +30,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 {
 	// 初期化処理
 	// エンジンの初期化
-	KamataEngine::Initialize(L"LE2B_07_クリタ_ユウダイ_アンカージャンプ");
+	KamataEngine::Initialize(L"AL4");
 
 	// DirectXCommonインスタンスの取得
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
@@ -40,7 +40,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 #ifdef _DEBUG
 
-	scene = Scene::kTitle;
+	scene = Scene::kGame;
 
 #endif // DEBUG
 

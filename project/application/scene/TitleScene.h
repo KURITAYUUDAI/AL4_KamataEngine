@@ -51,11 +51,11 @@ private:
 	Phase phase_ = Phase::kFadeIn;
 
 	// テクスチャを読み込む
-	uint32_t TEX1Handle = TextureManager::Load("Sprite/TEX1.png");
+	/*uint32_t TEX1Handle = TextureManager::Load("Sprite/TEX1.png");*/
 	uint32_t TEX2Handle = TextureManager::Load("Sprite/TEX2.png");
 
 	// Sprite作成
-	Sprite* TEX1Sprite_ = Sprite::Create(TEX1Handle, {0.0f, 0.0f});
+	/*Sprite* TEX1Sprite_ = Sprite::Create(TEX1Handle, {0.0f, 0.0f});*/
 	Sprite* TEX2Sprite_ = Sprite::Create(TEX2Handle, {0.0f, 0.0f});
 
 	// 自キャラモデル

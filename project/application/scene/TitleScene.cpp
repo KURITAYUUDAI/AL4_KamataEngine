@@ -3,7 +3,7 @@
 TitleScene::~TitleScene()
 {
 	delete fade_;
-	delete TEX1Sprite_;
+	/*delete TEX1Sprite_;*/
 	delete TEX2Sprite_;
 	delete modelPlayer_;
 }
@@ -110,7 +110,7 @@ void TitleScene::Draw()
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
 
-		TEX1Sprite_->Draw();
+		/*TEX1Sprite_->Draw();*/
 		TEX2Sprite_->Draw();
 
 		Sprite::PostDraw();
@@ -125,7 +125,7 @@ void TitleScene::Draw()
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
 
-		TEX1Sprite_->Draw();
+		/*TEX1Sprite_->Draw();*/
 		TEX2Sprite_->Draw();
 
 		Sprite::PostDraw();
@@ -138,7 +138,7 @@ void TitleScene::Draw()
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
 
-		TEX1Sprite_->Draw();
+		/*TEX1Sprite_->Draw();*/
 		TEX2Sprite_->Draw();
 
 		Sprite::PostDraw();

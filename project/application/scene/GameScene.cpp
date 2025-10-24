@@ -48,8 +48,8 @@ GameScene::~GameScene()
 	delete modelGoal_;
 	delete modelBackGround_;
 
-	delete EX1Sprite_;
-	delete EX2Sprite_;
+	/*delete EX1Sprite_;
+	delete EX2Sprite_;*/
 
 	delete this->debugCamera_;
 }
@@ -88,14 +88,14 @@ void GameScene::Initialize()
 	// マップチップフィールドの初期化
 	mapChipField_->LoadMapChipCsv("Resources/mapChip/blocks.csv");
 	
-	// 背景の生成
-	backGround_ = new BackGround();
+	//// 背景の生成
+	//backGround_ = new BackGround();
 
-	// 座標をマップチップ番号で指定
-	Vector3 backGroundPosition = mapChipField_->GetMapChipPositionByIndex(7, 49);
+	//// 座標をマップチップ番号で指定
+	//Vector3 backGroundPosition = mapChipField_->GetMapChipPositionByIndex(7, 49);
 
-	// 背景の初期化
-	backGround_->Initialize(modelBackGround_, &camera_, backGroundPosition + Vector3{0.0f, 0.0f, 1.1f});
+	//// 背景の初期化
+	//backGround_->Initialize(modelBackGround_, &camera_, backGroundPosition + Vector3{0.0f, 0.0f, 1.1f});
 
 	// 自キャラの生成
 	player_ = new Player();
@@ -178,8 +178,8 @@ void GameScene::Update()
 		// 天球の更新
 		skydome_->Update();
 
-		// 背景の更新
-		backGround_->Update();
+		//// 背景の更新
+		//backGround_->Update();
 
 		// 自キャラの更新
 		player_->Update();
@@ -242,8 +242,8 @@ void GameScene::Update()
 		// 天球の更新
 		skydome_->Update();
 
-		// 背景の更新
-		backGround_->Update();
+		//// 背景の更新
+		//backGround_->Update();
 		
 		Vector2 mousePos = Input::GetInstance()->GetMousePosition(); // 画面座標
 		Ray ray = ConvertScreenToWorldRay(mousePos, camera_);
@@ -421,6 +421,11 @@ void GameScene::Update()
 			return false;
 		});
 
+		if (Input::GetInstance()->PushKey(DIK_SPACE)) {
+			phase_ = Phase::kFadeOut;
+			fade_->Start(Fade::Status::FadeOut, 1.0f);
+		}
+
 		break;
 
 	case Phase::kDeath:
@@ -428,8 +433,8 @@ void GameScene::Update()
 		// 天球の更新
 		skydome_->Update();
 
-		// 背景の更新
-		backGround_->Update();
+		//// 背景の更新
+		//backGround_->Update();
 
 
 		// 敵Mobの更新
@@ -482,8 +487,8 @@ void GameScene::Update()
 		// 天球の更新
 		skydome_->Update();
 
-		// 背景の更新
-		backGround_->Update();
+		//// 背景の更新
+		//backGround_->Update();
 
 
 		// 敵Mobの更新
@@ -567,8 +572,8 @@ void GameScene::Draw()
 		// 天球の描画
 		skydome_->Draw();
 
-		// 背景の描画
-		backGround_->Draw();
+		//// 背景の描画
+		//backGround_->Draw();
 
 		// ブロックの描画
 		for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) 
@@ -599,8 +604,8 @@ void GameScene::Draw()
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
 
-		EX1Sprite_->Draw();
-		EX2Sprite_->Draw();
+		/*EX1Sprite_->Draw();
+		EX2Sprite_->Draw();*/
 
 		Sprite::PostDraw();
 
@@ -613,8 +618,8 @@ void GameScene::Draw()
 		// 天球の描画
 		skydome_->Draw();
 
-		// 背景の描画
-		backGround_->Draw();
+		//// 背景の描画
+		//backGround_->Draw();
 
 		// ブロックの描画
 		for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) 
@@ -665,8 +670,8 @@ void GameScene::Draw()
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
 
-		EX1Sprite_->Draw();
-		EX2Sprite_->Draw();
+		/*EX1Sprite_->Draw();
+		EX2Sprite_->Draw();*/
 
 		Sprite::PostDraw();
 
@@ -677,8 +682,8 @@ void GameScene::Draw()
 		// 天球の描画
 		skydome_->Draw();
 
-		// 背景の描画
-		backGround_->Draw();
+		//// 背景の描画
+		//backGround_->Draw();
 
 		// ブロックの描画
 		for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
@@ -712,8 +717,8 @@ void GameScene::Draw()
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
 
-		EX1Sprite_->Draw();
-		EX2Sprite_->Draw();
+		/*EX1Sprite_->Draw();
+		EX2Sprite_->Draw();*/
 
 		Sprite::PostDraw();
 
@@ -724,8 +729,8 @@ void GameScene::Draw()
 		// 天球の描画
 		skydome_->Draw();
 
-		// 背景の描画
-		backGround_->Draw();
+		//// 背景の描画
+		//backGround_->Draw();
 
 		// ブロックの描画
 		for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
@@ -763,8 +768,8 @@ void GameScene::Draw()
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
 
-		EX1Sprite_->Draw();
-		EX2Sprite_->Draw();
+		/*EX1Sprite_->Draw();
+		EX2Sprite_->Draw();*/
 
 		Sprite::PostDraw();
 

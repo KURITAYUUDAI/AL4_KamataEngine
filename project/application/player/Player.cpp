@@ -814,7 +814,7 @@ void PlayerStateGrapple::Update(Player* player)
 			player->SetBehaviorRequest(Player::Behavior::kRoot);
 		}
 
-		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		if (Input::GetInstance()->TriggerKey(DIK_F3)) {
 			player->EndGrapple();
 			player->SetBehaviorRequest(Player::Behavior::kRoot);
 		}

@@ -160,13 +160,13 @@ private:
 
 	Fade* fade_ = nullptr;
 
-	// テクスチャを読み込む
-	uint32_t EX1Handle = TextureManager::Load("Sprite/EX1.png");
-	uint32_t EX2Handle = TextureManager::Load("Sprite/EX2.png");
-	uint32_t BGHandle = TextureManager::Load("backGround/backGround.png");
+	//// テクスチャを読み込む
+	//uint32_t EX1Handle = TextureManager::Load("Sprite/EX1.png");
+	//uint32_t EX2Handle = TextureManager::Load("Sprite/EX2.png");
+	//uint32_t BGHandle = TextureManager::Load("backGround/backGround.png");
 
-	// スプライトを生成
-	Sprite* EX1Sprite_ = Sprite::Create(EX1Handle, {0.0f, 0.0f});
-	Sprite* EX2Sprite_ = Sprite::Create(EX2Handle, {1090.0f, 0.0f});
-	Sprite* BGSprite_ = Sprite::Create(BGHandle, {0.0f, 0.0f});
+	//// スプライトを生成
+	//Sprite* EX1Sprite_ = Sprite::Create(EX1Handle, {0.0f, 0.0f});
+	//Sprite* EX2Sprite_ = Sprite::Create(EX2Handle, {1090.0f, 0.0f});
+	//Sprite* BGSprite_ = Sprite::Create(BGHandle, {0.0f, 0.0f});
 };
