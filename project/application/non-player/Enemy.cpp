@@ -96,14 +96,6 @@ void Enemy::OnCollision(const Player* player)
 		return;
 	} 
 
-	if (player->IsAttack())
-	{
-		behaviorRequest_ = Behavior::kDead;
-
-		// 敵と自キャラの中間位置にエフェクトを生成
-		Vector3 effectPos = ((GetWorldPosition() + player->GetWorldPosition()) / 2.0f);
-		gameScene_->CreateHitEffect(effectPos);
-	} 
 }
 
 void Enemy::BehaviorRootUpdate() 

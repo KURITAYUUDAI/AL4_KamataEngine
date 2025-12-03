@@ -36,7 +36,7 @@ public:
 	
 	void Reset();
 	
-	void SetTarget(Player* target) { target_ = target; }
+	void SetTarget(const Vector3& target) { target_ = target; }
 	
 	const Camera& GetCamera() { return camera_; }
 
@@ -53,7 +53,7 @@ private:
 	// カメラ
 	Camera camera_;
 	
-	Player* target_ = nullptr;
+	Vector3 target_;
 
 	// 追従対象とカメラの座標の差（オフセット）
 	Vector3 targetOffset_ = { 0, 0, -30.0f };

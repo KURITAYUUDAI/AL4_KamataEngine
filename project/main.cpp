@@ -65,8 +65,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 		// シーン切り替え
 		ChangeScene();
+
+		ImGuiManager::GetInstance()->Begin();
+
+
 		// 現在シーン更新
 		UpdateScene();
+
+		ImGuiManager::GetInstance()->End();
 
 		// 描画開始
 		dxCommon->PreDraw();
@@ -74,6 +80,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		/// ここに描画処理を記述する
 		// 現在シーンの描画
 		DrawScene();
+
+		ImGuiManager::GetInstance()->Draw();
 
 		// 描画終了
 		dxCommon->PostDraw();
