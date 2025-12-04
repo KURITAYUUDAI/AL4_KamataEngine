@@ -1,17 +1,24 @@
 #define NOMINMAX
 #include "Player.h"
-#include "MapChipField.h"
 #include "Enemy.h"
 
 #include <numbers>
 #include <algorithm>
 
+#include "WorldTransformAssist.h"
+#include "PlayerBullet.h"
 
 using namespace KamataEngine;
 
 Player::~Player()
-{
+{ 
+	for (PlayerBullet* bullet : bullets_)
+	{
+		delete bullet;
+	}
+	bullets_.clear();
 
+	delete modelBullet_;
 }
 
 void Player::Initialize(Model* model, Camera* camera, const Vector3& position)
@@ -37,6 +44,8 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position)
 
 	// モード変更
 	ChangeBehavior(behaviorRequest_);
+
+	modelBullet_ = Model::Create();
 }
 
 void Player::Update() 
@@ -50,26 +59,56 @@ void Player::Update()
 
 	currentState_->Update(this);
 
-	// プレイヤーの更新処理を書く
-	worldTransform_.matWorld_ = MakeAffineMatrixB(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
+	for (PlayerBullet* bullet : bullets_) 
+	{
+		bullet->Update();
+	}
 
-	// 行列を定数バッファに転送
-	worldTransform_.TransferMatrix();
+	bullets_.remove_if([](PlayerBullet* bullet) 
+	{
+		if (bullet->GetIsDead()) 
+		{
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
+
+	WorldTransformUpdate(worldTransform_);
 
 	ImGui::Begin("player window");
 
-	ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.01f);
+	ImGui::DragFloat3("rotation", &worldTransform_.rotation_.x, 0.0f);
+
+	ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.0f);
+
+	ImGui::Text("bullet num : %d", static_cast<int>(bullets_.size()));
 
 	ImGui::End();
 }
 
 void Player::Draw() 
 {
-	// プレイヤーの描画処理を書く
+	for (PlayerBullet* bullet : bullets_) {
+		bullet->Draw();
+	}
 
+	// プレイヤーの描画処理を書く
 	// オブジェクトカラーを nullptr に設定して描画
 	model_->Draw(worldTransform_, *camera_, nullptr);
+}
 
+void Player::Rotate() 
+{
+	// 押した方向で移動ベクトルを変更
+	if (Input::GetInstance()->PushKey(DIK_A)) 
+	{
+		worldTransform_.rotation_.y -= kRotateSpeed;
+	} 
+	else if (Input::GetInstance()->PushKey(DIK_D)) 
+	{
+		worldTransform_.rotation_.y += kRotateSpeed;
+	}
 }
 
 void Player::Move()
@@ -114,6 +153,20 @@ void Player::Move()
 	
 }
 
+void Player::Attack() 
+{
+	// 弾の速度
+	Vector3 velocity(0, 0, kBulletSpeed);
+
+	velocity = TransformNormal(velocity, worldTransform_.matWorld_);
+
+	PlayerBullet* bullet = new PlayerBullet;
+
+	bullet->Initialize(modelBullet_, camera_, worldTransform_.translation_, velocity);
+
+	bullets_.push_back(bullet);
+}
+
 const Vector3 Player::GetWorldPosition() const
 {
 	// ワールド座標を入れる変数
@@ -139,6 +192,19 @@ AABB Player::GetAABB()
 	return aabb;
 }
 
+void Player::DestroyBullet(PlayerBullet* bullet) 
+{
+	for (auto it = bullets_.begin(); it != bullets_.end(); ++it) 
+	{
+		if (*it == bullet) 
+		{
+			delete *it;
+			bullets_.erase(it);
+			break;
+		}
+	}
+}
+
 void Player::OnCollision(const Enemy* enemy)
 {
 	//// ジャンプさせる
@@ -149,10 +215,19 @@ void Player::OnCollision(const Enemy* enemy)
 	isDead_ = true;
 }
 
+
+
 void Player::BehaviorRootUpdate() 
 {
-	
+
+	Rotate();
+
 	Move();
+
+	if (Input::GetInstance()->PushKey(DIK_SPACE))
+	{
+		Attack();
+	}
 	
 }
 

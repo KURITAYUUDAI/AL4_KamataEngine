@@ -8,7 +8,9 @@
 
 using namespace KamataEngine;
 
-#define pi std ::numbers::pi_v<float>
+static const float pi = std::numbers::pi_v<float>;
+
+static const float kDeltaTime = 1.0f / 60.0f;
 
 struct Transform 
 {
@@ -262,3 +264,6 @@ Matrix4x4 MakeLookRotation(const Vector3& forward, const Vector3& up);
 Vector3 GetEulerFromMatrix(const Matrix4x4& m);
 
 Matrix4x4 MakeLookRotationXAxis(const Vector3& xAxis, const Vector3& up);
+
+// ベクトル変換
+Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);

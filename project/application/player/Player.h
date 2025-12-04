@@ -5,11 +5,11 @@
 
 using namespace KamataEngine;
 
-class MapChipField;
-
 class Enemy;
 
 class Player;
+
+class PlayerBullet;
 
 class IPlayerState
 {
@@ -70,13 +70,15 @@ public:
 	/// </summary>
 	void Draw();
 
-	const WorldTransform& GetWorldTransform() const { return worldTransform_; }
-
-	void SetMapChipFiled(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
+	void Rotate();
 
 	void Move();
 
+	void Attack();
+
 	void OnCollision(const Enemy* enemy);
+
+public: // ビヘイビア関連
 
 	void BehaviorRootUpdate();
 
@@ -89,6 +91,7 @@ public:
 public:	// 外部入出力
 
 	/// ゲッター
+	const WorldTransform& GetWorldTransform() const { return worldTransform_; }
 	// トランスフォーム
 	const Vector3& GetScale() const { return worldTransform_.scale_; }
 	const Vector3& GetRotation() const { return worldTransform_.rotation_; }
@@ -111,7 +114,15 @@ public:	// 外部入出力
 	// 速度
 	void SetVelocity(const Vector3 velocity) { velocity_ = velocity; }
 
-	
+	std::list<PlayerBullet*> GetBullets() { return bullets_; }
+	void DestroyBullet(PlayerBullet* bullet);
+
+private:	// メンバ変数
+
+	std::list<PlayerBullet*> bullets_;
+
+	// 弾のモデル
+	Model* modelBullet_ = nullptr;
 
 private:
 
@@ -124,9 +135,6 @@ private:
 	// カメラ
 	Camera* camera_ = nullptr;
 
-	// マップチップによるフィールド
-	MapChipField* mapChipField_ = nullptr;
-
 	// 移動速度
 	Vector3 velocity_;
 
@@ -138,6 +146,11 @@ private:
 	static inline const float kMoveLimitY = 10.0f;
 	static inline const float kMoveLimitZ = 10.0f;
 
+	// 回転速さ
+	static inline const float kRotateSpeed = 1.0f / 120.0f * pi;
+
+	// 弾の速度
+	static inline const float kBulletSpeed = 1.0f;
 
 
 	// 移動加速度

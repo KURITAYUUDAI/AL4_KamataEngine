@@ -63,7 +63,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;USE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)application\camera;$(ProjectDir)application\player;$(ProjectDir)application\non-player;$(ProjectDir)application\stage;$(ProjectDir)application\scene;$(ProjectDir)engine\math;$(ProjectDir)engine\random;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)application\camera;$(ProjectDir)application\player;$(ProjectDir)application\non-player;$(ProjectDir)application\stage;$(ProjectDir)application\scene;$(ProjectDir)engine\math;$(ProjectDir)engine\random;$(ProjectDir)engine\assist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -87,7 +87,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)application\camera;$(ProjectDir)application\player;$(ProjectDir)application\non-player;$(ProjectDir)application\stage;$(ProjectDir)application\scene;$(ProjectDir)engine\math;$(ProjectDir)engine\random;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)application\camera;$(ProjectDir)application\player;$(ProjectDir)application\non-player;$(ProjectDir)application\stage;$(ProjectDir)application\scene;$(ProjectDir)engine\math;$(ProjectDir)engine\random;$(ProjectDir)engine\assist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>MinSpace</Optimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -108,24 +108,20 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application\player\AimCursor.cpp" />
-    <ClCompile Include="application\player\Anchor.cpp" />
     <ClCompile Include="application\stage\BackGround.cpp" />
     <ClCompile Include="application\camera\CameraController.cpp" />
     <ClCompile Include="application\player\DeathParticles.cpp" />
     <ClCompile Include="application\non-player\Enemy.cpp" />
     <ClCompile Include="application\camera\Fade.cpp" />
     <ClCompile Include="application\scene\GameScene.cpp" />
-    <ClCompile Include="application\non-player\Goal.cpp" />
-    <ClCompile Include="application\non-player\HitEffect.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="application\stage\MapChipField.cpp" />
     <ClCompile Include="engine\math\myMath.cpp" />
     <ClCompile Include="application\player\Player.cpp" />
     <ClCompile Include="engine\random\RandomEngine.cpp" />
     <ClCompile Include="application\stage\Skydome.cpp" />
     <ClCompile Include="application\scene\TitleScene.cpp" />
-    <ClCompile Include="application\player\Wire.cpp" />
+    <ClCompile Include="application\player\PlayerBullet.cpp" />
+    <ClCompile Include="engine\assist\WorldTransformAssist.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\TerrainPS.hlsl">
@@ -204,23 +200,19 @@
     <None Include="resources\shaders\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="application\player\AimCursor.h" />
-    <ClInclude Include="application\player\Anchor.h" />
     <ClInclude Include="application\stage\BackGround.h" />
     <ClInclude Include="application\camera\CameraController.h" />
     <ClInclude Include="application\player\DeathParticles.h" />
     <ClInclude Include="application\non-player\Enemy.h" />
     <ClInclude Include="application\camera\Fade.h" />
     <ClInclude Include="application\scene\GameScene.h" />
-    <ClInclude Include="application\non-player\Goal.h" />
-    <ClInclude Include="application\non-player\HitEffect.h" />
-    <ClInclude Include="application\stage\MapChipField.h" />
     <ClInclude Include="engine\math\myMath.h" />
     <ClInclude Include="application\player\Player.h" />
     <ClInclude Include="engine\random\RandomEngine.h" />
     <ClInclude Include="application\stage\Skydome.h" />
     <ClInclude Include="application\scene\TitleScene.h" />
-    <ClInclude Include="application\player\Wire.h" />
+    <ClInclude Include="application\player\PlayerBullet.h" />
+    <ClInclude Include="engine\assist\WorldTransformAssist.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
