@@ -2,6 +2,7 @@
 #include "Enemy.h"
 #include "GameScene.h"
 #include "Player.h"
+#include "PlayerBullet.h"
 
 #include "numbers"
 
@@ -22,16 +23,16 @@ void Enemy::Initialize(Model* model, Camera* camera, const Vector3& position)
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
-	worldTransform_.rotation_.y = 1.0f / 2.0f * std::numbers::pi_v<float>;
+	/*worldTransform_.rotation_.y = 1.0f / 2.0f * std::numbers::pi_v<float>;*/
 
 	// 速度を設定する
-	velocity_ = { -kWalkSpeed, 0.0f, 0.0f };
+	velocity_ = { 0.0f, 0.0f, -kWalkSpeed};
 
 	// 経過時間
 	walkTimer_ = 0.0f;
 
-	behavior_ = Behavior::kRoot;  // 初期モードはルート
-	behaviorRequest_ = behavior_; // リクエストモードもルート
+	behavior_ = Behavior::kApproach;	// 初期モード
+	behaviorRequest_ = behavior_;		// リクエストは初期モードと同様
 
 	// モード変更
 	ChangeBehavior(behaviorRequest_);
@@ -47,18 +48,37 @@ void Enemy::Update()
 
 	currentState_->Update(this);
 
+	if (worldTransform_.translation_.z)
+
 	// エネミーの更新処理を書く
 	worldTransform_.matWorld_ = 
 		MakeAffineMatrixB({1.0f, 1.0f, 1.0f}, worldTransform_.rotation_, worldTransform_.translation_);
 
 	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();
+
+	ImGui::Begin("enemy window");
+
+	ImGui::DragFloat3("rotation", &worldTransform_.rotation_.x, 0.0f);
+
+	ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.0f);
+
+	ImGui::Text("Behavior : %d", static_cast<int>(behavior_));
+
+	ImGui::End();
 }
 
 void Enemy::Draw()
 {
 	// オブジェクトカラーを nullptr に設定して描画
 	model_->Draw(worldTransform_, *camera_, nullptr);
+}
+
+void Enemy::OnCollision(const PlayerBullet* bullet) 
+{
+	(void)bullet;
+
+	behaviorRequest_ = Behavior::kDead;
 }
 
 Vector3 Enemy::GetWorldPosition() 
@@ -86,29 +106,29 @@ AABB Enemy::GetAABB()
 	return aabb;
 }
 
-void Enemy::OnCollision(const Player* player)
-{
-	(void)player;
-
-	if (behavior_ == Behavior::kDead) 
-	{
-		return;
-	} 
-
-}
+//void Enemy::OnCollision(const Player* player)
+//{
+//	(void)player;
+//
+//	if (behavior_ == Behavior::kDead) 
+//	{
+//		return;
+//	} 
+//
+//}
 
 void Enemy::BehaviorRootUpdate() 
 {
 	// 移動
 	worldTransform_.translation_ += velocity_;
 
-	// タイマーを加算
-	walkTimer_ += 1.0f / 60.0f;
+	//// タイマーを加算
+	//walkTimer_ += 1.0f / 60.0f;
 
-	// 回転アニメーション
-	float param = std::sin(2.0f * std::numbers::pi_v<float> * walkTimer_ / kWalkMotionTime);
-	float degree = kWalkMotionAngleStrat + (kWalkMotionAngleEnd - kWalkMotionAngleStrat) * ((param + 1.0f) / 2.0f);
-	worldTransform_.rotation_.x = DegToRad(degree);
+	//// 回転アニメーション
+	//float param = std::sin(2.0f * std::numbers::pi_v<float> * walkTimer_ / kWalkMotionTime);
+	//float degree = kWalkMotionAngleStrat + (kWalkMotionAngleEnd - kWalkMotionAngleStrat) * ((param + 1.0f) / 2.0f);
+	//worldTransform_.rotation_.x = DegToRad(degree);
 }
 
 void Enemy::BehaviorDeadUpdate() 
@@ -133,6 +153,16 @@ void Enemy::ChangeBehavior(Behavior behavior)
 	case Behavior::kRoot:
 		// Root状態の初期化処理
 		currentState_ = std::make_unique<EnemyStateRoot>();
+		break;
+
+	case Behavior::kApproach:
+		// Root状態の初期化処理
+		currentState_ = std::make_unique<EnemyStateApproach>();
+		break;
+
+	case Behavior::kLeave:
+		// Root状態の初期化処理
+		currentState_ = std::make_unique<EnemyStateLeave>();
 		break;
 
 	case Behavior::kDead:
@@ -200,10 +230,64 @@ void EnemyStateDead::Update(Enemy* enemy)
 
 void EnemyStateDead::Draw(Enemy* enemy) 
 { 
-	enemy = enemy; 
+	(void)enemy; 
 }
 
 void EnemyStateDead::Shutdown(Enemy* enemy) 
 { 
-	enemy = enemy; 
+	(void)enemy; 
+}
+
+void EnemyStateApproach::Initialize(Enemy* enemy) 
+{
+	(void)enemy;
+
+	velocity_ = {0.0f, 0.0f, 5.0f};
+}
+
+void EnemyStateApproach::Update(Enemy* enemy) 
+{ 
+	enemy->SetTranslation(enemy->GetTranslation() + velocity_ * kDeltaTime); 
+
+	if (enemy->GetTranslation().z > 7.0f)
+	{
+		enemy->SetBehaviorRequest(Enemy::Behavior::kLeave);
+	}
+}
+
+void EnemyStateApproach::Draw(Enemy* enemy) 
+{ 
+	(void)enemy; 
+}
+
+void EnemyStateApproach::Shutdown(Enemy* enemy) 
+{ 
+	(void)enemy; 
+}
+
+void EnemyStateLeave::Initialize(Enemy* enemy) 
+{ 
+	(void)enemy;
+
+	velocity_ = {0.0f, 0.0f, -5.0f}; 
+}
+
+void EnemyStateLeave::Update(Enemy* enemy) 
+{
+	enemy->SetTranslation(enemy->GetTranslation() + velocity_ * kDeltaTime); 
+
+	if (enemy->GetTranslation().z < 2.0f) 
+	{
+		enemy->SetBehaviorRequest(Enemy::Behavior::kApproach);
+	}
+}
+
+void EnemyStateLeave::Draw(Enemy* enemy) 
+{ 
+	(void)enemy; 
+}
+
+void EnemyStateLeave::Shutdown(Enemy* enemy) 
+{ 
+	(void)enemy; 
 }

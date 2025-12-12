@@ -74,6 +74,8 @@ public:
 
 	void Move();
 
+	void Shot();
+
 	void Attack();
 
 	void OnCollision(const Enemy* enemy);
@@ -151,6 +153,18 @@ private:
 
 	// 弾の速度
 	static inline const float kBulletSpeed = 1.0f;
+
+	// 弾のクールタイム
+	float coolTimer_;
+	static inline const float kBulletCoolTime = 0.2f;
+
+	// リロードの時間
+	float reloadTimer_;
+	static inline const float kReloadTime = 3.0f;
+
+	// 弾数
+	int bulletRemain_;
+	static inline const int kMaxBullet = 10;
 
 
 	// 移動加速度

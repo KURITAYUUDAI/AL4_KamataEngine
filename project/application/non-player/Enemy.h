@@ -12,6 +12,8 @@ class Player;
 
 class Enemy;
 
+class PlayerBullet;
+
 class IEnemyState {
 public:
 	virtual ~IEnemyState() = default;
@@ -33,6 +35,9 @@ public:
 	{
 		kUnknown, // リクエストなし
 		kRoot,    // 通常
+
+		kApproach,
+		kLeave,
 		kDead,    // デッド状態
 	};
 
@@ -54,7 +59,11 @@ public:
 	void Draw();
 
 	// 衝突応答
-	void OnCollision(const Player* player);
+	/*void OnCollision(const Player* player);*/
+
+	void OnCollision(const PlayerBullet* bullet);
+
+
 
 	void BehaviorRootUpdate();
 
@@ -148,6 +157,31 @@ public:
 	void Update(Enemy* enemy) override;
 	void Draw(Enemy* enemy) override;
 	void Shutdown(Enemy* enemy) override;
+};
+
+class EnemyStateApproach : public IEnemyState
+{
+public:
+	void Initialize(Enemy* enemy) override;
+	void Update(Enemy* enemy) override;
+	void Draw(Enemy* enemy) override;
+	void Shutdown(Enemy* enemy) override;
+
+private:
+
+	Vector3 velocity_;
+};
+
+class EnemyStateLeave : public IEnemyState 
+{
+public:
+	void Initialize(Enemy* enemy) override;
+	void Update(Enemy* enemy) override;
+	void Draw(Enemy* enemy) override;
+	void Shutdown(Enemy* enemy) override;
+
+private:
+	Vector3 velocity_;
 };
 
 class EnemyStateDead : public IEnemyState 

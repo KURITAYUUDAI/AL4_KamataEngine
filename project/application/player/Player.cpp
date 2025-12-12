@@ -39,6 +39,11 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position)
 
 	velocity_ = { 0.0f,0.0f, 0.0f };
 
+	coolTimer_ = 0.0f;
+	reloadTimer_ = 0.0f;
+
+	bulletRemain_ = kMaxBullet;
+
 	behavior_ = Behavior::kRoot; // 初期モードはルート
 	behaviorRequest_ = behavior_; // リクエストモードもルート
 
@@ -83,6 +88,11 @@ void Player::Update()
 	ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.0f);
 
 	ImGui::Text("bullet num : %d", static_cast<int>(bullets_.size()));
+
+	ImGui::Text("bulletRemain: %d", static_cast<int>(bulletRemain_));
+
+	ImGui::Text("reloadTimer : %f", reloadTimer_);
+
 
 	ImGui::End();
 }
@@ -151,6 +161,44 @@ void Player::Move()
 	worldTransform_.translation_.z = std::clamp(worldTransform_.translation_.z, -kMoveLimitZ, kMoveLimitZ);
 
 	
+}
+
+void Player::Shot() 
+{
+	if (bulletRemain_ != 0)
+	{
+		if (Input::GetInstance()->PushKey(DIK_SPACE) && coolTimer_ == 0.0f) 
+		{
+			Attack();
+			coolTimer_ = kBulletCoolTime;
+			bulletRemain_--;
+
+			if (bulletRemain_ == 0) 
+			{
+				reloadTimer_ = kReloadTime;
+			}
+		}
+	}
+
+	if (coolTimer_ != 0.0f) 
+	{
+		coolTimer_ -= kDeltaTime;
+		if (coolTimer_ < 0.0f) 
+		{
+			coolTimer_ = 0.0f;
+		}
+	}
+
+	if (reloadTimer_ != 0.0f)
+	{
+		reloadTimer_ -= kDeltaTime;
+		if (reloadTimer_ < 0.0f)
+		{
+			reloadTimer_ = 0.0f;
+
+			bulletRemain_ = kMaxBullet;
+		}
+	}
 }
 
 void Player::Attack() 
@@ -224,10 +272,7 @@ void Player::BehaviorRootUpdate()
 
 	Move();
 
-	if (Input::GetInstance()->PushKey(DIK_SPACE))
-	{
-		Attack();
-	}
+	Shot();
 	
 }
 

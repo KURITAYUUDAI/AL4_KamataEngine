@@ -2,6 +2,8 @@
 #include "KamataEngine.h"
 #include "myMath.h"
 
+class Enemy;
+
 class PlayerBullet 
 {
 public:
@@ -22,6 +24,8 @@ public:
 	/// </summary>
 	void Draw();
 
+	void OnCollision(const Enemy* enemy);
+
 public:	// 外部入出力
 
 	const Vector3& GetScale() { return worldTransform_.scale_; }
@@ -29,6 +33,11 @@ public:	// 外部入出力
 	const Vector3& GetTranslation() { return worldTransform_.translation_; };
 	const Vector3& GetVelocity() { return velocity_; }
 	const bool GetIsDead() { return isDead_; }
+
+	// ワールドポジション
+	const Vector3 GetWorldPosition() const;
+	// AABB
+	AABB GetAABB();
 
 	void SetScale(const Vector3& scale) { worldTransform_.scale_ = scale; }
 	void SetRotation(const Vector3& rotation) { worldTransform_.rotation_ = rotation; }
@@ -45,7 +54,7 @@ private:
 
 	const Camera* camera_;
 
-	Vector3 size_ = {0.8f, 0.8f};
+	Vector3 size_ = {0.8f, 0.8f, 0.8f};
 
 	const float speed_ = 2.0f;
 
@@ -54,7 +63,7 @@ private:
 	Vector3 velocity_;
 
 	// 寿命
-	static inline const int32_t kLifeTime = 60 * 5;
+	static inline const int32_t kLifeTime = 60 * 2;
 
 	// デスタイマー
 	int32_t deathTimer_ = kLifeTime;

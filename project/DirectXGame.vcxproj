@@ -114,6 +114,7 @@
     <ClCompile Include="application\non-player\Enemy.cpp" />
     <ClCompile Include="application\camera\Fade.cpp" />
     <ClCompile Include="application\scene\GameScene.cpp" />
+    <ClCompile Include="engine\random\SeedManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\math\myMath.cpp" />
     <ClCompile Include="application\player\Player.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="application\scene\TitleScene.h" />
     <ClInclude Include="application\player\PlayerBullet.h" />
     <ClInclude Include="engine\assist\WorldTransformAssist.h" />
+    <ClInclude Include="engine\random\SeedManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

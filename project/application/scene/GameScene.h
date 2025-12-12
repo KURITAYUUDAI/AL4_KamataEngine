@@ -8,6 +8,7 @@
 #include "DeathParticles.h"
 #include "Fade.h"
 #include "BackGround.h"
+#include "Enemy.h"
 
 
 /// <summary>
@@ -52,6 +53,8 @@ public:
 	// 自キャラ
 	Player* player_ = nullptr;
 
+	std::list<Enemy*> enemies_;
+
 	// 天球
 	Skydome* skydome_ = nullptr;
 
@@ -80,6 +83,9 @@ private:
 
 	// 自キャラモデル
 	Model* modelPlayer_ = nullptr;
+
+	// 敵キャラモデル
+	Model* modelEnemy_ = nullptr;
 	
 	// 天球モデル
 	Model* modelSkydome_ = nullptr;

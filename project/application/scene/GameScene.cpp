@@ -3,13 +3,20 @@
 #include <limits>
 #include "3d/AxisIndicator.h"
 
+#include "PlayerBullet.h"
+#include "SeedManager.h"
+
 using namespace KamataEngine;
 
 GameScene::~GameScene() 
 {
 	delete player_;
 
-	
+	for (Enemy* enemy : enemies_)
+	{
+		delete enemy;
+	}
+	enemies_.clear();
 
 	delete skydome_;
 
@@ -37,6 +44,8 @@ void GameScene::Initialize()
 
 	// 3Dモデルの生成
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
+
+	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
 	
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 	modelDeathParticle_ = Model::CreateFromOBJ("deathParticles", true);
@@ -59,7 +68,22 @@ void GameScene::Initialize()
 	// 自キャラの初期化
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
 
-	
+	// 敵キャラの生成
+	for (int i = 0; i < 1; ++i)
+	{
+		Enemy* enemy = new Enemy();
+
+		Vector3 pos = 
+		{
+			SeedManager::GetInstance()->GenerateFloat(-5.0f, 5.0f), 
+			SeedManager::GetInstance()->GenerateFloat(-5.0f, 5.0f), 
+			7.0f
+		};
+
+		enemy->Initialize(modelEnemy_, &camera_, pos);
+
+		enemies_.push_back(enemy);
+	}
 
 	fade_ = new Fade();
 	fade_->Initialize();
@@ -108,7 +132,20 @@ void GameScene::Update()
 		// 自キャラの更新
 		player_->Update();
 
-		
+		for (Enemy* enemy : enemies_)
+		{
+			enemy->Update();
+		}
+
+		enemies_.remove_if([](Enemy * enemy)
+		{ 
+			if (enemy->GetIsDead())
+			{
+				delete enemy;
+				return true;
+			}
+			return false;
+		});
 
 		// カメラの処理
 		if (isDebugCameraActive_) 
@@ -148,6 +185,37 @@ void GameScene::Update()
 
 		// 自キャラの更新
 		player_->Update();
+
+		if (Input::GetInstance()->TriggerKey(DIK_F4)) 
+		{
+			Enemy* enemy = new Enemy();
+
+			Vector3 pos = 
+			{
+				SeedManager::GetInstance()->GenerateFloat(-5.0f, 5.0f), 
+				SeedManager::GetInstance()->GenerateFloat(-5.0f, 5.0f), 
+				7.0f
+			};
+
+			enemy->Initialize(modelEnemy_, &camera_, pos);
+
+			enemies_.push_back(enemy);
+		}
+
+		for (Enemy* enemy : enemies_) 
+		{
+			enemy->Update();
+		}
+
+		enemies_.remove_if([](Enemy* enemy) 
+		{
+			if (enemy->GetIsDead()) 
+			{
+				delete enemy;
+				return true;
+			}
+			return false;
+		});
 
 		// カメラの処理
 		if (isDebugCameraActive_) {
@@ -189,6 +257,18 @@ void GameScene::Update()
 		// 天球の更新
 		skydome_->Update();
 
+		for (Enemy* enemy : enemies_) {
+			enemy->Update();
+		}
+
+		enemies_.remove_if([](Enemy* enemy) {
+			if (enemy->GetIsDead()) {
+				delete enemy;
+				return true;
+			}
+			return false;
+		});
+
 		//// 背景の更新
 		//backGround_->Update();
 
@@ -216,6 +296,18 @@ void GameScene::Update()
 
 		// 天球の更新
 		skydome_->Update();
+
+		for (Enemy* enemy : enemies_) {
+			enemy->Update();
+		}
+
+		enemies_.remove_if([](Enemy* enemy) {
+			if (enemy->GetIsDead()) {
+				delete enemy;
+				return true;
+			}
+			return false;
+		});
 
 		//// 背景の更新
 		//backGround_->Update();
@@ -286,6 +378,12 @@ void GameScene::Draw()
 		// 自キャラの描画
 		player_->Draw();
 
+		// 敵キャラの描画
+		for (Enemy* enemy : enemies_)
+		{
+			enemy->Draw();
+		}
+
 		Sprite::PreDraw(dxCommon->GetCommandList());
 
 		/*EX1Sprite_->Draw();
@@ -308,6 +406,10 @@ void GameScene::Draw()
 		// 自キャラの描画
 		player_->Draw();
 
+		// 敵キャラの描画
+		for (Enemy* enemy : enemies_) {
+			enemy->Draw();
+		}
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
 
@@ -332,6 +434,10 @@ void GameScene::Draw()
 			deathParticles_->Draw();
 		}
 
+		// 敵キャラの描画
+		for (Enemy* enemy : enemies_) {
+			enemy->Draw();
+		}
 		
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
@@ -359,8 +465,13 @@ void GameScene::Draw()
 
 		if (player_) 
 		{
-			// 自キャラの描画
-			player_->Draw();
+			//// 自キャラの描画
+			//player_->Draw();
+		}
+
+		// 敵キャラの描画
+		for (Enemy* enemy : enemies_) {
+			enemy->Draw();
 		}
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
@@ -441,6 +552,45 @@ void GameScene::CheckAllCollisions()
 		
 	}
 	#pragma endregion
+
+	#pragma region 自弾と敵Mobの当たり判定
+	{
+		// 判定対象1と2の距離
+		AABB aabb1, aabb2;
+
+		// 自弾の座標
+		for (PlayerBullet* bullet : player_->GetBullets())
+		{
+			aabb1 = bullet->GetAABB();
+
+			// 自キャラと敵Mob全ての当たり判定
+			for (Enemy* enemy : enemies_) 
+			{
+				if (enemy->IsCollisionDisabled()) 
+				{
+					// 衝突無効フラグが立っている場合はスキップ
+					continue;
+				}
+
+				// 敵Mobの座標
+				aabb2 = enemy->GetAABB();
+
+				// AABB同士の交差判定
+				if (IsCollision(aabb1, aabb2)) 
+				{
+					// 自弾の衝突時間数を呼び出す
+					bullet->OnCollision(enemy);
+					// 敵の衝突時関数を呼び出す
+					enemy->OnCollision(bullet);
+				}
+			}
+		}
+
+		
+
+		
+	}
+#pragma endregion
 }
 
 void GameScene::ChangePhase()
