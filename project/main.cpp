@@ -2,12 +2,14 @@
 #include "KamataEngine.h"
 #include "TitleScene.h"
 #include "GameScene.h"
+#include "ResultScene.h"
 
 using namespace KamataEngine;
 
 // 確認用
 TitleScene* titleScene = nullptr;
 GameScene* gameScene = nullptr;
+ResultScene* resultScene = nullptr;
 
 // シーン（型）
 enum class Scene
@@ -16,6 +18,7 @@ enum class Scene
 
 	kTitle,
 	kGame,
+	kResult,
 };
 
 // 現在シーン（型）
@@ -30,7 +33,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 {
 	// 初期化処理
 	// エンジンの初期化
-	KamataEngine::Initialize(L"AL4");
+	KamataEngine::Initialize(L"LE2C_12_クリタ_ユウダイ_ANCHORSHOOT");
 
 	// DirectXCommonインスタンスの取得
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
@@ -54,6 +57,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	// ゲームシーンの初期化
 	gameScene->Initialize();
 
+	// リザルトシーンのインスタンス作成
+	resultScene = new ResultScene();
+	// リザルトシーンの初期化
+	resultScene->Initialize();
+
 	// メインループ
 	while (true)
 	{
@@ -66,13 +74,21 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		// シーン切り替え
 		ChangeScene();
 
+	#ifdef _DEBUG
+
 		ImGuiManager::GetInstance()->Begin();
+
+	#endif
 
 
 		// 現在シーン更新
 		UpdateScene();
 
+	#ifdef _DEBUG
+
 		ImGuiManager::GetInstance()->End();
+
+	#endif
 
 		// 描画開始
 		dxCommon->PreDraw();
@@ -81,7 +97,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		// 現在シーンの描画
 		DrawScene();
 
+	#ifdef _DEBUG
+
 		ImGuiManager::GetInstance()->Draw();
+
+	#endif
 
 		// 描画終了
 		dxCommon->PostDraw();
@@ -125,16 +145,32 @@ void ChangeScene()
 		if (gameScene->IsFinished()) 
 		{
 			// シーン変更
-			scene = Scene::kTitle;
+			scene = Scene::kResult;
 			// 旧シーンの解放
 			delete gameScene;
 			gameScene = nullptr;
+			// 新シーンの生成と初期化
+			resultScene = new ResultScene;
+			resultScene->Initialize();
+		}
+
+		break;
+	
+	case Scene::kResult:
+
+		if (resultScene->IsFinished()) {
+			// シーン変更
+			scene = Scene::kTitle;
+			// 旧シーンの解放
+			delete resultScene;
+			resultScene = nullptr;
 			// 新シーンの生成と初期化
 			titleScene = new TitleScene;
 			titleScene->Initialize();
 		}
 
 		break;
+
 	}
 }
 
@@ -153,6 +189,12 @@ void UpdateScene()
 		gameScene->Update();
 
 		break;
+
+	case Scene::kResult:
+
+		resultScene->Update();
+
+		break;
 	}
 }
 
@@ -169,6 +211,12 @@ void DrawScene()
 	case Scene::kGame:
 
 		gameScene->Draw();
+
+		break;
+
+	case Scene::kResult:
+
+		resultScene->Draw();
 
 		break;
 	}

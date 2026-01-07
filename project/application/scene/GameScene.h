@@ -9,7 +9,7 @@
 #include "Fade.h"
 #include "BackGround.h"
 #include "Enemy.h"
-
+#include "Anchor.h"
 
 /// <summary>
 /// ゲームシーン
@@ -55,6 +55,10 @@ public:
 
 	std::list<Enemy*> enemies_;
 
+	void SetRespawnTimer();
+
+	void RespawnEnemy();
+
 	// 天球
 	Skydome* skydome_ = nullptr;
 
@@ -84,8 +88,17 @@ private:
 	// 自キャラモデル
 	Model* modelPlayer_ = nullptr;
 
+	// 自弾モデル
+	Model* modelPlayerBullet_ = nullptr;
+
+	// アンカーモデル
+	Model* modelAnchor_ = nullptr;
+
 	// 敵キャラモデル
 	Model* modelEnemy_ = nullptr;
+
+	// 敵弾モデル
+	Model* modelEnemyBullet_ = nullptr;
 	
 	// 天球モデル
 	Model* modelSkydome_ = nullptr;
@@ -103,12 +116,25 @@ private:
 
 	Fade* fade_ = nullptr;
 
+	// 敵の最大数
+	int maxEnemies_ = 6;
+
+	// 敵のリスポーンタイマー
+	std::list<float> respawnTimers_;
+
 	//// テクスチャを読み込む
-	//uint32_t EX1Handle = TextureManager::Load("Sprite/EX1.png");
-	//uint32_t EX2Handle = TextureManager::Load("Sprite/EX2.png");
-	//uint32_t BGHandle = TextureManager::Load("backGround/backGround.png");
+	uint32_t HowToOperate1Handle = TextureManager::Load("Sprite/HowToOperate1.png");
+	uint32_t HowToOperate2Handle = TextureManager::Load("Sprite/HowToOperate2.png");
+	uint32_t HowToOperate3Handle = TextureManager::Load("Sprite/HowToOperate3.png");
+	uint32_t hitPointHandle = TextureManager::Load("Sprite/hitPoint.png");
 
 	//// スプライトを生成
+	Sprite* HowToOperate1Sprite_ = Sprite::Create(HowToOperate1Handle, {0.0f, 0.0f});
+	Sprite* HowToOperate2Sprite_ = Sprite::Create(HowToOperate2Handle, {0.0f, 0.0f});
+	Sprite* HowToOperate3Sprite_ = Sprite::Create(HowToOperate3Handle, {0.0f, 0.0f});
+	
+	std::vector<Sprite*> hitPointSprites_;
+
 	//Sprite* EX1Sprite_ = Sprite::Create(EX1Handle, {0.0f, 0.0f});
 	//Sprite* EX2Sprite_ = Sprite::Create(EX2Handle, {1090.0f, 0.0f});
 	//Sprite* BGSprite_ = Sprite::Create(BGHandle, {0.0f, 0.0f});

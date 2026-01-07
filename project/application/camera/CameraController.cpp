@@ -7,7 +7,6 @@
 void CameraController::Initialize() 
 { 
 	camera_.Initialize(); 
-
 }
 
 void CameraController::Update()
@@ -49,6 +48,8 @@ void CameraController::Update()
 	//// 移動範囲制限
 	//camera_.translation_.x = std::clamp(camera_.translation_.x, minX, maxX);
 	//camera_.translation_.y = std::clamp(camera_.translation_.y, minY, maxY);
+
+	camera_.translation_ = {0.0f, 0.0f, -20.0f};
 
 	// 行列を更新する
 	camera_.UpdateMatrix();

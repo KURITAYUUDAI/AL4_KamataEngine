@@ -14,6 +14,10 @@ class Enemy;
 
 class PlayerBullet;
 
+class Anchor;
+
+class EnemyBullet;
+
 class IEnemyState {
 public:
 	virtual ~IEnemyState() = default;
@@ -33,12 +37,12 @@ public:
 
 	enum class Behavior
 	{
-		kUnknown, // リクエストなし
-		kRoot,    // 通常
+		kUnknown,	// リクエストなし
+		kRoot,		// 通常
+		kDead,		// デッド状態
 
-		kApproach,
-		kLeave,
-		kDead,    // デッド状態
+		kGrappled,	// 掴まれ状態
+		kShoot,		// 射出状態
 	};
 
 	/// <summary>
@@ -58,12 +62,18 @@ public:
 	/// </summary>
 	void Draw();
 
+	void Shot(const Vector3& velocity, const float& bulletCoolTime, const bool& isNeedReload);
+
 	// 衝突応答
 	/*void OnCollision(const Player* player);*/
 
 	void OnCollision(const PlayerBullet* bullet);
 
+	void OnCollision(const Anchor* anchor);
 
+	void OnCollision(const EnemyBullet* enemyBullet);
+
+	void OnCollision(const Enemy* enemy);
 
 	void BehaviorRootUpdate();
 
@@ -77,6 +87,8 @@ public:
 	static void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
 	/// ゲッター
+	// ビヘイビア
+	Behavior GetBehavior() const { return behavior_; }
 	// ビヘイビアリクエスト
 	Behavior GetBehaviorRequest() const { return behaviorRequest_; }
 	// トランスフォーム
@@ -85,10 +97,23 @@ public:
 	const Vector3 GetTranslation() const { return worldTransform_.translation_; }
 	// 死亡判定
 	bool GetIsDead() const { return isDead_; }	
+	// ワールド行列
+	const Matrix4x4 GetWorldMatrix() { return worldTransform_.matWorld_; }
 	// ワールドポジション
 	Vector3 GetWorldPosition();
 	// AABB
 	AABB GetAABB();
+	// Width
+	float GetWidth() const { return kWidth_; }
+	// Height
+	float GetHeight() const { return kHeight_; }
+	// 掴まれ時の被弾判定
+	bool GetIsGrappledHit() const { return isGrappledHit_; }
+	// 掴まれ判定
+	bool GetIsGrappled() const { return isGrappled_; }
+
+	// 捕まったアンカー
+	const Anchor* GetGrappleAnchor() const { return grappleAnchor_; }
 
 	/// セッター
 	// ビヘイビアリクエスト
@@ -102,6 +127,9 @@ public:
 	// コリジョン無効判定
 	void SetIsCollisionDisabled(bool isCollisionDisabled) { isCollisionDisabled_ = isCollisionDisabled; }
 	
+	// 掴まれ時の被弾判定
+	void SetIsGrappledHit(bool isGrappledHit) { isGrappledHit_ = isGrappledHit; }
+
 	bool IsCollisionDisabled() const { return isCollisionDisabled_; }
 
 private:
@@ -122,7 +150,9 @@ private:
 	float walkTimer_ = 0.0f;
 
 	// 歩行の速さ
-	static inline const float kWalkSpeed = 0.025f;
+	static inline const float kWalkSpeed = 0.7f;
+
+	
 
 	// 最初の角度[度]
 	static inline const float kWalkMotionAngleStrat = 25.0f;
@@ -146,8 +176,37 @@ private:
 	Behavior behavior_ = Behavior::kRoot;
 
 	Behavior behaviorRequest_ = Behavior::kUnknown;
-
 	
+	// 掴まれフラグ
+	bool isGrappled_ = false;
+
+	// 掴まれ時のアンカーのポインタ
+	const Anchor* grappleAnchor_ = nullptr;
+
+	// 掴まれ時の被弾判定
+	bool isGrappledHit_ = false;
+
+	// 弾の速度
+	static inline const float kBulletSpeed = -0.5f;
+
+	// 弾のクールタイム
+	float coolTimer_;
+	static inline const float kBulletCoolTime = 3.0f;
+
+	// リロードの時間
+	float reloadTimer_;
+	static inline const float kReloadTime = 3.0f;
+
+	// 弾数
+	int bulletRemain_;
+	static inline const int kMaxBullet = 20;
+
+	int hitPoint_;
+	const int kMaxHitPoint = 3;
+
+	float damageTimer_;
+	const float kDamageInvincible_ = 0.5f;
+
 };
 
 class EnemyStateRoot : public IEnemyState 
@@ -157,31 +216,6 @@ public:
 	void Update(Enemy* enemy) override;
 	void Draw(Enemy* enemy) override;
 	void Shutdown(Enemy* enemy) override;
-};
-
-class EnemyStateApproach : public IEnemyState
-{
-public:
-	void Initialize(Enemy* enemy) override;
-	void Update(Enemy* enemy) override;
-	void Draw(Enemy* enemy) override;
-	void Shutdown(Enemy* enemy) override;
-
-private:
-
-	Vector3 velocity_;
-};
-
-class EnemyStateLeave : public IEnemyState 
-{
-public:
-	void Initialize(Enemy* enemy) override;
-	void Update(Enemy* enemy) override;
-	void Draw(Enemy* enemy) override;
-	void Shutdown(Enemy* enemy) override;
-
-private:
-	Vector3 velocity_;
 };
 
 class EnemyStateDead : public IEnemyState 
@@ -196,4 +230,43 @@ private:
 	float animationTimer_ = 0.0f;
 
 	float deathAnimation_ = 1.0f;
+};
+
+class EnemyStateGrappled : public IEnemyState 
+{
+public:
+	void Initialize(Enemy* enemy) override;
+	void Update(Enemy* enemy) override;
+	void Draw(Enemy* enemy) override;
+	void Shutdown(Enemy* enemy) override;
+
+private:
+
+	int hitPoint_;
+	const int kMaxHitPoint = 10;
+
+	// 弾の速度
+	static inline const float kBulletSpeed = 1.5f;
+
+	// 弾のクールタイム
+	static inline const float kBulletCoolTime = 0.5f;
+};
+
+class EnemyStateShoot : public IEnemyState 
+{
+public:
+	void Initialize(Enemy* enemy) override;
+	void Update(Enemy* enemy) override;
+	void Draw(Enemy* enemy) override;
+	void Shutdown(Enemy* enemy) override;
+
+private:
+	
+	Vector3 shootVelocity_;
+	
+	const float shootSpeed_ = 0.5f;
+
+	float shootTimer_ = 0.0f;
+
+	float maxShootTimer_ = 2.0f;
 };

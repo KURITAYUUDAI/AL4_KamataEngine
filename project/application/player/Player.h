@@ -9,7 +9,11 @@ class Enemy;
 
 class Player;
 
+class Anchor;
+
 class PlayerBullet;
+
+class EnemyBullet;
 
 class IPlayerState
 {
@@ -36,7 +40,8 @@ public:
 		kUnknown, // リクエストなし
 		kRoot,    // 通常状態
 		kAttack,  // 攻撃
-		kGrapple,
+		kAnchor,  // アンカー射出
+		kCapture, // 掴み
 	};
 
 
@@ -58,7 +63,7 @@ public:
 	/// </summary>
 	/// <param name = "model">モデル</param>
 	/// <param name = "textureHandle">テクスチャハンドル</param>
-	void Initialize(Model* model, Camera* camera, const Vector3& position);
+	void Initialize(Model* model, Camera* camera, const Vector3& position, Model* modelBullet, Model* modelAnchor);
 
 	/// <summary>
 	/// 更新
@@ -78,7 +83,11 @@ public:
 
 	void Attack();
 
+	void ShotAnchor();
+
 	void OnCollision(const Enemy* enemy);
+
+	void OnCollision(const EnemyBullet* bullet);
 
 public: // ビヘイビア関連
 
@@ -100,11 +109,15 @@ public:	// 外部入出力
 	const Vector3& GetTranslation() const { return worldTransform_.translation_; }
 	// 速度
 	const Vector3& GetVelocity() const { return velocity_; }
+	// ワールド行列
+	const Matrix4x4 GetWorldMatrix() { return worldTransform_.matWorld_; }
 	// ワールドポジション
 	const Vector3 GetWorldPosition() const;
 	// AABB
 	AABB GetAABB();
 	
+	// HP
+	const int& GetHitPoint() const { return hitPoint_; }
 	// デスフラグ
 	bool GetIsDead() const { return isDead_; } 
 
@@ -115,9 +128,14 @@ public:	// 外部入出力
 	void SetTranslation(const Vector3& translation) { worldTransform_.translation_ = translation; }
 	// 速度
 	void SetVelocity(const Vector3 velocity) { velocity_ = velocity; }
+	// アンカー射出フラグ
+	void SetIsShotAnchor(bool isShot) { isShotAnchor_ = isShot; }
+
 
 	std::list<PlayerBullet*> GetBullets() { return bullets_; }
 	void DestroyBullet(PlayerBullet* bullet);
+
+	Anchor* GetAnchor() { return anchor_; }
 
 private:	// メンバ変数
 
@@ -125,6 +143,8 @@ private:	// メンバ変数
 
 	// 弾のモデル
 	Model* modelBullet_ = nullptr;
+
+	Anchor* anchor_ = nullptr;
 
 private:
 
@@ -156,7 +176,7 @@ private:
 
 	// 弾のクールタイム
 	float coolTimer_;
-	static inline const float kBulletCoolTime = 0.2f;
+	static inline const float kBulletCoolTime = 0.6f;
 
 	// リロードの時間
 	float reloadTimer_;
@@ -167,19 +187,30 @@ private:
 	static inline const int kMaxBullet = 10;
 
 
+	// アンカー射出フラグ
+	bool isShotAnchor_ = false;
+
 	// 移動加速度
 	static inline const float kAcceleration = 0.01f;
 	// 移動減速度
 	static inline const float kAttenuation = 0.15f;
 	// 移動最大速度
 	static inline const float kLimitSpeed = 0.5f;
-	
+
 
 	// キャラクターの当たり判定サイズ
 	static inline const float kWidth_ = 1.8f;
 	static inline const float kHeight_ = 1.8f;
 
 	static inline const float kBlank = 0.001f;
+
+	// HP
+	int hitPoint_;
+	// 最大HP
+	static inline const int kMaxHitPoint = 5;
+
+	float damageTimer_;
+	const float kDamageInvincible_ = 1.0f;
 
 	// デスフラグ
 	bool isDead_ = false;

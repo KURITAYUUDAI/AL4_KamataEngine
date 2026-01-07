@@ -154,6 +154,7 @@ inline Vector2 operator+(const Vector2& v1, const Vector2& v2) { return {v1.x + 
 inline Vector2 operator-(const Vector2& v1, const Vector2& v2) { return {v1.x - v2.x, v1.y - v2.y}; }
 inline Vector2 operator*(float s, const Vector2& v) { return {s * v.x, s * v.y}; }
 inline Vector2 operator*(const Vector2& v, float s) { return s * v; }
+inline Vector2 operator*(const Vector2& v1, const Vector2& v2) { return {v1.x * v2.x, v1.y * v2.y}; }
 inline Vector2 operator/(const Vector2& v, float s) { return {v.x / s, v.y / s}; }
 
 inline Vector2 operator-(const Vector2& v) { return {-v.x, -v.y}; }

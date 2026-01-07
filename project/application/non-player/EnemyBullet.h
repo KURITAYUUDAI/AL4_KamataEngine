@@ -4,7 +4,9 @@
 
 class Enemy;
 
-class PlayerBullet 
+class Player;
+
+class EnemyBullet 
 {
 public:
 	/// <summary>
@@ -26,8 +28,9 @@ public:
 
 	void OnCollision(const Enemy* enemy);
 
-public:	// 外部入出力
+	void OnCollision(const Player* player);
 
+public: // 外部入出力
 	const Vector3& GetScale() { return worldTransform_.scale_; }
 	const Vector3& GetRotation() { return worldTransform_.rotation_; }
 	const Vector3& GetTranslation() { return worldTransform_.translation_; };
@@ -44,9 +47,7 @@ public:	// 外部入出力
 	void SetTranslation(const Vector3& translation) { worldTransform_.translation_ = translation; }
 	void SetVelocity(const Vector3& velocity) { velocity_ = velocity; }
 
-
 private:
-
 	WorldTransform worldTransform_;
 
 	Model* model_;
@@ -54,7 +55,7 @@ private:
 
 	const Camera* camera_;
 
-	Vector3 size_ = {0.4f, 0.4f, 0.4f};
+	Vector3 size_ = {0.8f, 0.8f, 0.8f};
 
 	const float speed_ = 2.0f;
 
@@ -69,5 +70,4 @@ private:
 	int32_t deathTimer_ = kLifeTime;
 	// デスフラグ
 	bool isDead_ = false;
-
 };

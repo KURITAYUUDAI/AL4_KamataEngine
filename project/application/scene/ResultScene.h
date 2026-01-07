@@ -4,23 +4,19 @@
 #include "Fade.h"
 #include "Skydome.h"
 
-using namespace KamataEngine;
-
-/// <summary>
-/// ゲームシーン
-/// </summary>
-class TitleScene 
+class ResultScene 
 {
 public:
+
+	public:
 	// ゲームのフェーズ(型)
-	enum class Phase 
-	{
-		kFadeIn,	// フェードイン
-		kMain,		// メイン部
-		kFadeOut,	// フェードアウト
+	enum class Phase {
+		kFadeIn,  // フェードイン
+		kMain,    // メイン部
+		kFadeOut, // フェードアウト
 	};
 
-	~TitleScene();
+	~ResultScene();
 
 	// 初期化
 	void Initialize();
@@ -33,13 +29,12 @@ public:
 
 	// デスフラグのgetter
 	bool IsFinished() const { return finished_; }
-	
+
 	// カメラ
 	Camera camera_;
 
 	// 天球
 	Skydome* skydome_ = nullptr;
-
 
 private:
 
@@ -53,12 +48,12 @@ private:
 	// テクスチャを読み込む
 	/*uint32_t TEX1Handle = TextureManager::Load("Sprite/TEX1.png");*/
 	uint32_t TEX2Handle = TextureManager::Load("Sprite/TEX2.png");
-	uint32_t titleHandle = TextureManager::Load("Sprite/title.png");
+	uint32_t gameOverHandle = TextureManager::Load("Sprite/gameOver.png");
 
 	// Sprite作成
 	/*Sprite* TEX1Sprite_ = Sprite::Create(TEX1Handle, {0.0f, 0.0f});*/
 	Sprite* TEX2Sprite_ = Sprite::Create(TEX2Handle, {0.0f, 0.0f});
-	Sprite* titleSprite_ = Sprite::Create(titleHandle, {0.0f, 0.0f});
+	Sprite* gameOverSprite_ = Sprite::Create(gameOverHandle, {0.0f, 0.0f});
 
 	// 自キャラモデル
 	Model* modelPlayer_ = nullptr;
@@ -67,5 +62,4 @@ private:
 
 	// 天球モデル
 	Model* modelSkydome_ = nullptr;
-
 };

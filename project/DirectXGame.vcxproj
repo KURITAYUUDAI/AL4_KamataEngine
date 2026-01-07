@@ -114,6 +114,9 @@
     <ClCompile Include="application\non-player\Enemy.cpp" />
     <ClCompile Include="application\camera\Fade.cpp" />
     <ClCompile Include="application\scene\GameScene.cpp" />
+    <ClCompile Include="application\non-player\BulletManager.cpp" />
+    <ClCompile Include="application\non-player\EnemyBullet.cpp" />
+    <ClCompile Include="engine\math\SpriteDraw.cpp" />
     <ClCompile Include="engine\random\SeedManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\math\myMath.cpp" />
@@ -123,6 +126,8 @@
     <ClCompile Include="application\scene\TitleScene.cpp" />
     <ClCompile Include="application\player\PlayerBullet.cpp" />
     <ClCompile Include="engine\assist\WorldTransformAssist.cpp" />
+    <ClCompile Include="application\scene\ResultScene.cpp" />
+    <ClCompile Include="application\player\Anchor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\TerrainPS.hlsl">
@@ -207,14 +212,19 @@
     <ClInclude Include="application\non-player\Enemy.h" />
     <ClInclude Include="application\camera\Fade.h" />
     <ClInclude Include="application\scene\GameScene.h" />
+    <ClInclude Include="application\non-player\BulletManager.h" />
+    <ClInclude Include="application\non-player\EnemyBullet.h" />
     <ClInclude Include="engine\math\myMath.h" />
     <ClInclude Include="application\player\Player.h" />
+    <ClInclude Include="engine\math\SpriteDraw.h" />
     <ClInclude Include="engine\random\RandomEngine.h" />
     <ClInclude Include="application\stage\Skydome.h" />
     <ClInclude Include="application\scene\TitleScene.h" />
     <ClInclude Include="application\player\PlayerBullet.h" />
     <ClInclude Include="engine\assist\WorldTransformAssist.h" />
     <ClInclude Include="engine\random\SeedManager.h" />
+    <ClInclude Include="application\scene\ResultScene.h" />
+    <ClInclude Include="application\player\Anchor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

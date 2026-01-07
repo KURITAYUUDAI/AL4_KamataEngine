@@ -8,6 +8,8 @@
 #include "WorldTransformAssist.h"
 #include "PlayerBullet.h"
 
+#include "Anchor.h"
+
 using namespace KamataEngine;
 
 Player::~Player()
@@ -18,10 +20,10 @@ Player::~Player()
 	}
 	bullets_.clear();
 
-	delete modelBullet_;
+	delete anchor_;
 }
 
-void Player::Initialize(Model* model, Camera* camera, const Vector3& position)
+void Player::Initialize(Model* model, Camera* camera, const Vector3& position, Model* modelBullet, Model* modelAnchor) 
 {
 	// プレイヤーの初期化処理を書く
 
@@ -30,6 +32,8 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position)
 
 	model_ = model;
 
+	modelBullet_ = modelBullet;
+
 	camera_ = camera;
 
 	// ワールドトランスフォームの初期化
@@ -37,20 +41,23 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position)
 	worldTransform_.translation_ = position;
 	worldTransform_.rotation_.y = 0.0f;
 
-	velocity_ = { 0.0f,0.0f, 0.0f };
+	velocity_ = {0.0f, 0.0f, 0.0f};
 
 	coolTimer_ = 0.0f;
 	reloadTimer_ = 0.0f;
 
 	bulletRemain_ = kMaxBullet;
 
-	behavior_ = Behavior::kRoot; // 初期モードはルート
+	anchor_ = new Anchor;
+	anchor_->Initialize(modelAnchor, camera_, this, position, {0.0f, 0.0f, 0.5f});
+
+	hitPoint_ = kMaxHitPoint;
+
+	behavior_ = Behavior::kRoot;  // 初期モードはルート
 	behaviorRequest_ = behavior_; // リクエストモードもルート
 
 	// モード変更
 	ChangeBehavior(behaviorRequest_);
-
-	modelBullet_ = Model::Create();
 }
 
 void Player::Update() 
@@ -61,8 +68,22 @@ void Player::Update()
 		ChangeBehavior(behaviorRequest_);
 	}
 
+	if (anchor_->GetIsFinished())
+	{
+		isShotAnchor_ = false;
+	}
+
 
 	currentState_->Update(this);
+
+	if (damageTimer_ > 0.0f) 
+	{
+		damageTimer_ -= kDeltaTime;
+	}
+	if (damageTimer_ < 0.0f) 
+	{
+		damageTimer_ = 0.0f;
+	}
 
 	for (PlayerBullet* bullet : bullets_) 
 	{
@@ -79,7 +100,11 @@ void Player::Update()
 		return false;
 	});
 
+	anchor_->Update();
+
 	WorldTransformUpdate(worldTransform_);
+
+#ifdef _DEBUG
 
 	ImGui::Begin("player window");
 
@@ -93,8 +118,12 @@ void Player::Update()
 
 	ImGui::Text("reloadTimer : %f", reloadTimer_);
 
+	ImGui::Text("isShotAnchor : %d", isShotAnchor_);
+
 
 	ImGui::End();
+
+#endif
 }
 
 void Player::Draw() 
@@ -103,22 +132,27 @@ void Player::Draw()
 		bullet->Draw();
 	}
 
-	// プレイヤーの描画処理を書く
-	// オブジェクトカラーを nullptr に設定して描画
-	model_->Draw(worldTransform_, *camera_, nullptr);
+	anchor_->Draw();
+
+	if (static_cast<int>(damageTimer_ * 60.0f) % 5 == 0)
+	{
+		// プレイヤーの描画処理を書く
+		// オブジェクトカラーを nullptr に設定して描画
+		model_->Draw(worldTransform_, *camera_, nullptr);
+	}
 }
 
 void Player::Rotate() 
 {
-	// 押した方向で移動ベクトルを変更
-	if (Input::GetInstance()->PushKey(DIK_A)) 
-	{
-		worldTransform_.rotation_.y -= kRotateSpeed;
-	} 
-	else if (Input::GetInstance()->PushKey(DIK_D)) 
-	{
-		worldTransform_.rotation_.y += kRotateSpeed;
-	}
+	//// 押した方向で移動ベクトルを変更
+	//if (Input::GetInstance()->PushKey(DIK_A)) 
+	//{
+	//	worldTransform_.rotation_.y -= kRotateSpeed;
+	//} 
+	//else if (Input::GetInstance()->PushKey(DIK_D)) 
+	//{
+	//	worldTransform_.rotation_.y += kRotateSpeed;
+	//}
 }
 
 void Player::Move()
@@ -127,31 +161,22 @@ void Player::Move()
 	Vector3 move = { 0.0f, 0.0f, 0.0f };
 
 	// 押した方向で移動ベクトルを変更
-	if (Input::GetInstance()->PushKey(DIK_LEFT))
+	if (Input::GetInstance()->PushKey(DIK_A))
 	{
 		move.x -= kCharacterSpped;
 	} 
-	else if (Input::GetInstance()->PushKey(DIK_RIGHT))
+	else if (Input::GetInstance()->PushKey(DIK_D))
 	{
 		move.x += kCharacterSpped;
 	}
 
-	if (Input::GetInstance()->PushKey(DIK_DOWN)) 
+	if (Input::GetInstance()->PushKey(DIK_S)) 
 	{
 		move.y -= kCharacterSpped;
 	} 
-	else if (Input::GetInstance()->PushKey(DIK_UP)) 
-	{
-		move.y += kCharacterSpped;
-	}
-
-	if (Input::GetInstance()->PushKey(DIK_S)) 
-	{
-		move.z -= kCharacterSpped;
-	} 
 	else if (Input::GetInstance()->PushKey(DIK_W)) 
 	{
-		move.z += kCharacterSpped;
+		move.y += kCharacterSpped;
 	}
 
 	worldTransform_.translation_ += move;
@@ -171,7 +196,7 @@ void Player::Shot()
 		{
 			Attack();
 			coolTimer_ = kBulletCoolTime;
-			bulletRemain_--;
+			// bulletRemain_--;
 
 			if (bulletRemain_ == 0) 
 			{
@@ -199,10 +224,16 @@ void Player::Shot()
 			bulletRemain_ = kMaxBullet;
 		}
 	}
+
+	if (Input::GetInstance()->TriggerKey(DIK_B) && !isShotAnchor_)
+	{
+		ShotAnchor();
+	}
 }
 
 void Player::Attack() 
 {
+
 	// 弾の速度
 	Vector3 velocity(0, 0, kBulletSpeed);
 
@@ -213,6 +244,19 @@ void Player::Attack()
 	bullet->Initialize(modelBullet_, camera_, worldTransform_.translation_, velocity);
 
 	bullets_.push_back(bullet);
+}
+
+void Player::ShotAnchor() 
+{
+	// アンカーの速度と方向を設定
+	Vector3 velocity(0, 0, kBulletSpeed);
+
+	velocity = TransformNormal(velocity, worldTransform_.matWorld_);
+
+	// アンカークラスに発射命令
+	anchor_->Shoot(velocity);
+
+	isShotAnchor_ = true;
 }
 
 const Vector3 Player::GetWorldPosition() const
@@ -260,7 +304,31 @@ void Player::OnCollision(const Enemy* enemy)
 
 	(void)enemy;
 
-	isDead_ = true;
+	if (damageTimer_ == 0.0f) 
+	{
+		hitPoint_--;
+		damageTimer_ = kDamageInvincible_;
+	}
+	if (hitPoint_ <= 0) 
+	{
+		isDead_ = true;
+	}
+}
+
+void Player::OnCollision(const EnemyBullet* bullet) 
+{
+	
+	(void)bullet;
+
+	if (damageTimer_ == 0.0f)
+	{
+		hitPoint_--;
+		damageTimer_ = kDamageInvincible_;
+	}
+	if (hitPoint_ <= 0)
+	{
+		isDead_ = true;
+	}
 }
 
 

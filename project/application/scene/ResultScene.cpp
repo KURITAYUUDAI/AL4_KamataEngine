@@ -1,20 +1,18 @@
-#include "TitleScene.h"
+#include "ResultScene.h"
 #include "SpriteDraw.h"
 
-TitleScene::~TitleScene()
+ResultScene::~ResultScene() 
 {
 	delete fade_;
 	/*delete TEX1Sprite_;*/
 	delete TEX2Sprite_;
-	delete titleSprite_;
 	delete modelPlayer_;
 }
 
-void TitleScene::Initialize()
-{ 
+void ResultScene::Initialize() {
 	phase_ = Phase::kFadeIn;
 
-	fade_ = new Fade(); 
+	fade_ = new Fade();
 	fade_->Initialize();
 	fade_->Start(Fade::Status::FadeIn, 1.0f);
 
@@ -37,13 +35,11 @@ void TitleScene::Initialize()
 	camera_.Initialize();
 }
 
-void TitleScene::Update() 
-{ 
+void ResultScene::Update() {
 	worldTransformPlayer_.matWorld_ = MakeAffineMatrixB(worldTransformPlayer_.scale_, worldTransformPlayer_.rotation_, worldTransformPlayer_.translation_);
 	worldTransformPlayer_.TransferMatrix();
 
-	switch (phase_) 
-	{
+	switch (phase_) {
 	case Phase::kFadeIn:
 
 		// 天球の更新
@@ -51,8 +47,7 @@ void TitleScene::Update()
 
 		fade_->Update();
 
-		if (fade_->IsFinished())
-		{
+		if (fade_->IsFinished()) {
 			phase_ = Phase::kMain;
 		}
 
@@ -63,14 +58,13 @@ void TitleScene::Update()
 		// 天球の更新
 		skydome_->Update();
 
-		if (Input::GetInstance()->PushKey(DIK_SPACE)) 
-		{
+		if (Input::GetInstance()->PushKey(DIK_SPACE)) {
 			phase_ = Phase::kFadeOut;
 			fade_->Start(Fade::Status::FadeOut, 1.0f);
 		}
 
 		break;
-	
+
 	case Phase::kFadeOut:
 
 		// 天球の更新
@@ -78,15 +72,14 @@ void TitleScene::Update()
 
 		fade_->Update();
 
-		if (fade_->IsFinished()) 
-		{
+		if (fade_->IsFinished()) {
 			finished_ = true;
 		}
 
 		break;
 	}
 
-	 // 行列を更新
+	// 行列を更新
 
 	camera_.UpdateMatrix();
 
@@ -95,16 +88,15 @@ void TitleScene::Update()
 	camera_.TransferMatrix();
 }
 
-void TitleScene::Draw()
-{ 
+void ResultScene::Draw() 
+{
 	// DirectXCommonインスタンスの取得
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
 	// 3Dモデル描画前処理
 	Model::PreDraw(dxCommon->GetCommandList());
 
-	switch (phase_) 
-	{
+	switch (phase_) {
 
 	case Phase::kFadeIn:
 
@@ -114,7 +106,9 @@ void TitleScene::Draw()
 
 		/*TEX1Sprite_->Draw();*/
 		TEX2Sprite_->Draw();
-		titleSprite_->Draw();
+
+		SpriteDraw::GetInstance()->Draw(gameOverSprite_,
+			SRT2D{{1.0f, 1.0f}, 0.0f, {640.0f, 250.f}}, {0.5f, 0.5f}, {645.0f, 111.0f});
 
 		Sprite::PostDraw();
 
@@ -130,7 +124,9 @@ void TitleScene::Draw()
 
 		/*TEX1Sprite_->Draw();*/
 		TEX2Sprite_->Draw();
-		titleSprite_->Draw();
+
+		SpriteDraw::GetInstance()->Draw(gameOverSprite_,
+			SRT2D{{1.0f, 1.0f}, 0.0f, {640.0f, 250.f}}, {0.5f, 0.5f}, {645.0f, 111.0f});
 
 		Sprite::PostDraw();
 
@@ -142,9 +138,11 @@ void TitleScene::Draw()
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
 
+		SpriteDraw::GetInstance()->Draw(gameOverSprite_,
+			SRT2D{{1.0f, 1.0f}, 0.0f, {640.0f, 250.f}}, {0.5f, 0.5f}, {645.0f, 111.0f});
+
 		/*TEX1Sprite_->Draw();*/
 		TEX2Sprite_->Draw();
-		titleSprite_->Draw();
 
 		Sprite::PostDraw();
 
@@ -152,6 +150,4 @@ void TitleScene::Draw()
 
 		break;
 	}
-
-	
 }
