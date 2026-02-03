@@ -155,6 +155,12 @@ void Player::Move()
 		move.y += kCharacterSpped;
 	}
 
+	if (move.x != 0.0f && move.y != 0.0f)
+	{
+		move.x *= 0.7f;
+		move.y *= 0.7f;
+	}
+
 	worldTransform_.translation_ += move;
 
 	worldTransform_.translation_.x = std::clamp(worldTransform_.translation_.x, -kMoveLimitX, kMoveLimitX);

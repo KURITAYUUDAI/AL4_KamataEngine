@@ -157,8 +157,8 @@ private:
 	static inline const float kCharacterSpped = 0.2f;
 
 	// 移動限界
-	static inline const float kMoveLimitX = 20.0f;
-	static inline const float kMoveLimitY = 10.0f;
+	static inline const float kMoveLimitX = 13.5f;
+	static inline const float kMoveLimitY = 7.0f;
 	static inline const float kMoveLimitZ = 10.0f;
 
 	// 回転速さ
