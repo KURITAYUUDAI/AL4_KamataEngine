@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include "WorldTransformAssist.h"
-#include "PlayerBullet.h"
+#include "BulletManager.h"
 
 #include "Anchor.h"
 
@@ -14,16 +14,11 @@ using namespace KamataEngine;
 
 Player::~Player()
 { 
-	for (PlayerBullet* bullet : bullets_)
-	{
-		delete bullet;
-	}
-	bullets_.clear();
 
 	delete anchor_;
 }
 
-void Player::Initialize(Model* model, Camera* camera, const Vector3& position, Model* modelBullet, Model* modelAnchor) 
+void Player::Initialize(Model* model, Camera* camera, const Vector3& position,  Model* modelAnchor) 
 {
 	// プレイヤーの初期化処理を書く
 
@@ -31,8 +26,6 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position, M
 	assert(model);
 
 	model_ = model;
-
-	modelBullet_ = modelBullet;
 
 	camera_ = camera;
 
@@ -73,7 +66,6 @@ void Player::Update()
 		isShotAnchor_ = false;
 	}
 
-
 	currentState_->Update(this);
 
 	if (damageTimer_ > 0.0f) 
@@ -84,21 +76,6 @@ void Player::Update()
 	{
 		damageTimer_ = 0.0f;
 	}
-
-	for (PlayerBullet* bullet : bullets_) 
-	{
-		bullet->Update();
-	}
-
-	bullets_.remove_if([](PlayerBullet* bullet) 
-	{
-		if (bullet->GetIsDead()) 
-		{
-			delete bullet;
-			return true;
-		}
-		return false;
-	});
 
 	anchor_->Update();
 
@@ -111,8 +88,6 @@ void Player::Update()
 	ImGui::DragFloat3("rotation", &worldTransform_.rotation_.x, 0.0f);
 
 	ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.0f);
-
-	ImGui::Text("bullet num : %d", static_cast<int>(bullets_.size()));
 
 	ImGui::Text("bulletRemain: %d", static_cast<int>(bulletRemain_));
 
@@ -128,9 +103,6 @@ void Player::Update()
 
 void Player::Draw() 
 {
-	for (PlayerBullet* bullet : bullets_) {
-		bullet->Draw();
-	}
 
 	anchor_->Draw();
 
@@ -190,39 +162,46 @@ void Player::Move()
 
 void Player::Shot() 
 {
-	if (bulletRemain_ != 0)
+	//if (bulletRemain_ != 0)
+	//{
+	//	if (Input::GetInstance()->PushKey(DIK_SPACE) && coolTimer_ == 0.0f) 
+	//	{
+	//		Attack();
+	//		coolTimer_ = kBulletCoolTime;
+	//		// bulletRemain_--;
+
+	//		if (bulletRemain_ == 0) 
+	//		{
+	//			reloadTimer_ = kReloadTime;
+	//		}
+	//	}
+	//}
+
+	//if (coolTimer_ != 0.0f) 
+	//{
+	//	coolTimer_ -= kDeltaTime;
+	//	if (coolTimer_ < 0.0f) 
+	//	{
+	//		coolTimer_ = 0.0f;
+	//	}
+	//}
+
+	//if (reloadTimer_ != 0.0f)
+	//{
+	//	reloadTimer_ -= kDeltaTime;
+	//	if (reloadTimer_ < 0.0f)
+	//	{
+	//		reloadTimer_ = 0.0f;
+
+	//		bulletRemain_ = kMaxBullet;
+	//	}
+	//}
+
+	anchor_->SetIsShotEnemyBullet(false);
+
+	if (Input::GetInstance()->PushKey(DIK_SPACE) && anchor_->GetMode() == Anchor::Mode::kHold)
 	{
-		if (Input::GetInstance()->PushKey(DIK_SPACE) && coolTimer_ == 0.0f) 
-		{
-			Attack();
-			coolTimer_ = kBulletCoolTime;
-			// bulletRemain_--;
-
-			if (bulletRemain_ == 0) 
-			{
-				reloadTimer_ = kReloadTime;
-			}
-		}
-	}
-
-	if (coolTimer_ != 0.0f) 
-	{
-		coolTimer_ -= kDeltaTime;
-		if (coolTimer_ < 0.0f) 
-		{
-			coolTimer_ = 0.0f;
-		}
-	}
-
-	if (reloadTimer_ != 0.0f)
-	{
-		reloadTimer_ -= kDeltaTime;
-		if (reloadTimer_ < 0.0f)
-		{
-			reloadTimer_ = 0.0f;
-
-			bulletRemain_ = kMaxBullet;
-		}
+		anchor_->SetIsShotEnemyBullet(true);
 	}
 
 	if (Input::GetInstance()->TriggerKey(DIK_B) && !isShotAnchor_)
@@ -239,11 +218,7 @@ void Player::Attack()
 
 	velocity = TransformNormal(velocity, worldTransform_.matWorld_);
 
-	PlayerBullet* bullet = new PlayerBullet;
-
-	bullet->Initialize(modelBullet_, camera_, worldTransform_.translation_, velocity);
-
-	bullets_.push_back(bullet);
+	BulletManager::GetInstance()->CreatePlayerBullet(worldTransform_.translation_, velocity);
 }
 
 void Player::ShotAnchor() 
@@ -284,19 +259,6 @@ AABB Player::GetAABB()
 	return aabb;
 }
 
-void Player::DestroyBullet(PlayerBullet* bullet) 
-{
-	for (auto it = bullets_.begin(); it != bullets_.end(); ++it) 
-	{
-		if (*it == bullet) 
-		{
-			delete *it;
-			bullets_.erase(it);
-			break;
-		}
-	}
-}
-
 void Player::OnCollision(const Enemy* enemy)
 {
 	//// ジャンプさせる
@@ -315,7 +277,7 @@ void Player::OnCollision(const Enemy* enemy)
 	}
 }
 
-void Player::OnCollision(const EnemyBullet* bullet) 
+void Player::OnCollision(const Bullet* bullet) 
 {
 	
 	(void)bullet;

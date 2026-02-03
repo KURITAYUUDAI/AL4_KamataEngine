@@ -1,10 +1,10 @@
-#include "EnemyBullet.h"
+#include "Bullet.h"
 #include "assert.h"
 #include "WorldTransformAssist.h"
 #include "BulletManager.h"
 
-void EnemyBullet::Initialize(Model* model, const Camera* camera,
-	const Vector3& position, const Vector3& velocity)
+void Bullet::Initialize(Model* model, const Camera* camera, const Vector3& position, 
+	const Vector3& velocity, const ID& id) 
 {
 	assert(model);
 	model_ = model;
@@ -12,16 +12,14 @@ void EnemyBullet::Initialize(Model* model, const Camera* camera,
 	textureHandle_ = TextureManager::Load("uvChecker.png");
 	camera_ = camera;
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = { 0.5f, 0.5f, 0.5f };
-	worldTransform_.rotation_ = { 0.0f, 0.0f, 0.0f };
+	worldTransform_.scale_ = {0.5f, 0.5f, 0.5f};
+	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
 	worldTransform_.translation_ = position;
 	velocity_ = velocity;
-
-	
+	id_ = id;
 }
 
-void EnemyBullet::Update()
-{
+void Bullet::Update() {
 	worldTransform_.translation_ += velocity_;
 	worldTransform_.matWorld_ = BulletManager::GetInstance()->GetBillboardWorldMatrix(
 		worldTransform_.scale_, worldTransform_.translation_);
@@ -32,24 +30,24 @@ void EnemyBullet::Update()
 	}
 }
 
-void EnemyBullet::Draw()
+void Bullet::Draw()
 {
 	model_->Draw(worldTransform_, *camera_, nullptr); 
 }
 
-void EnemyBullet::OnCollision(const Enemy* enemy)
+void Bullet::OnCollision(const Enemy* enemy)
 {
 	(void)enemy;
 	isDead_ = true;
 }
 
-void EnemyBullet::OnCollision(const Player* player)
+void Bullet::OnCollision(const Player* player)
 {
 	(void)player;
 	isDead_ = true;
 }
 
-const Vector3 EnemyBullet::GetWorldPosition() const 
+const Vector3 Bullet::GetWorldPosition() const 
 {
 	// ワールド座標を入れる変数
 	Vector3 worldPos;
@@ -60,7 +58,7 @@ const Vector3 EnemyBullet::GetWorldPosition() const
 	return worldPos;
 }
 
-AABB EnemyBullet::GetAABB() 
+AABB Bullet::GetAABB() 
 {
 	Vector3 worldPos = GetWorldPosition();
 	AABB aabb;

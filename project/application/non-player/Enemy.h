@@ -16,7 +16,7 @@ class PlayerBullet;
 
 class Anchor;
 
-class EnemyBullet;
+class Bullet;
 
 class IEnemyState {
 public:
@@ -64,16 +64,18 @@ public:
 
 	void Shot(const Vector3& velocity, const float& bulletCoolTime, const bool& isNeedReload);
 
-	// 衝突応答
-	/*void OnCollision(const Player* player);*/
+	void ResetBulletStatus();
 
-	void OnCollision(const PlayerBullet* bullet);
+public: // 衝突応答
+	/*void OnCollision(const Player* player);*/
 
 	void OnCollision(const Anchor* anchor);
 
-	void OnCollision(const EnemyBullet* enemyBullet);
+	void OnCollision(const Bullet* enemyBullet);
 
 	void OnCollision(const Enemy* enemy);
+
+public:
 
 	void BehaviorRootUpdate();
 
@@ -82,15 +84,20 @@ public:
 	// モード変更
 	void ChangeBehavior(Behavior behavior);
 
-	static GameScene* gameScene_;
-	
-	static void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
-
-	/// ゲッター
 	// ビヘイビア
 	Behavior GetBehavior() const { return behavior_; }
 	// ビヘイビアリクエスト
 	Behavior GetBehaviorRequest() const { return behaviorRequest_; }
+
+	// ビヘイビアリクエスト
+	void SetBehaviorRequest(Behavior behaviorRequest) { behaviorRequest_ = behaviorRequest; }
+
+public:
+
+	
+
+	/// ゲッター
+	
 	// トランスフォーム
 	const Vector3 GetScale() const { return worldTransform_.scale_; }
 	const Vector3 GetRotation() const { return worldTransform_.rotation_; }
@@ -114,10 +121,14 @@ public:
 
 	// 捕まったアンカー
 	const Anchor* GetGrappleAnchor() const { return grappleAnchor_; }
+	
+	bool GetIsCollisionDisabled() const { return isCollisionDisabled_; }
 
 	/// セッター
-	// ビヘイビアリクエスト
-	void SetBehaviorRequest(Behavior behaviorRequest) { behaviorRequest_ = behaviorRequest; }
+	// ゲームシーン
+	static void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
+	// プレイヤー
+	void SetPlayer(Player* player) { player_ = player; }
 	// トランスフォーム
 	void SetScale(const Vector3& scale) { worldTransform_.scale_ = scale; }
 	void SetRotation(const Vector3& rotation) { worldTransform_.rotation_ = rotation; }
@@ -128,11 +139,15 @@ public:
 	void SetIsCollisionDisabled(bool isCollisionDisabled) { isCollisionDisabled_ = isCollisionDisabled; }
 	
 	// 掴まれ時の被弾判定
-	void SetIsGrappledHit(bool isGrappledHit) { isGrappledHit_ = isGrappledHit; }
+	void SetIsGrappledHit(bool isGrappledHit) { isGrappledHit_ = isGrappledHit; }	
 
-	bool IsCollisionDisabled() const { return isCollisionDisabled_; }
+public:
+
+	static GameScene* gameScene_;
 
 private:
+
+	Player* player_;
 
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -207,6 +222,8 @@ private:
 	float damageTimer_;
 	const float kDamageInvincible_ = 0.5f;
 
+
+	bool isTarget_ = false;
 };
 
 class EnemyStateRoot : public IEnemyState 

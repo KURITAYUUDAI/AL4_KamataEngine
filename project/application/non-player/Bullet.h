@@ -6,15 +6,23 @@ class Enemy;
 
 class Player;
 
-class EnemyBullet 
+class Bullet 
 {
+public:
+
+	enum class ID
+	{
+		kPlayer,
+		kEnemy,
+	};
+
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name = "model">モデル</param>
 	/// <param name = "textureHandle">テクスチャハンドル</param>
-	void Initialize(Model* model, const Camera* camera, const Vector3& position, const Vector3& velocity);
+	void Initialize(Model* model, const Camera* camera, const Vector3& position, const Vector3& velocity, const ID& id);
 
 	/// <summary>
 	/// 更新
@@ -36,6 +44,7 @@ public: // 外部入出力
 	const Vector3& GetTranslation() { return worldTransform_.translation_; };
 	const Vector3& GetVelocity() { return velocity_; }
 	const bool GetIsDead() { return isDead_; }
+	const ID& GetID() { return id_; }
 
 	// ワールドポジション
 	const Vector3 GetWorldPosition() const;
@@ -62,6 +71,8 @@ private:
 	Vector3 direction_;
 
 	Vector3 velocity_;
+
+	ID id_;
 
 	// 寿命
 	static inline const int32_t kLifeTime = 60 * 2;

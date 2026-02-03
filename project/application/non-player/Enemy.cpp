@@ -5,7 +5,7 @@
 #include "PlayerBullet.h"
 #include "Anchor.h"
 #include "BulletManager.h"
-
+#include "StageTime.h"
 #include "numbers"
 
 using namespace KamataEngine;
@@ -30,7 +30,7 @@ void Enemy::Initialize(Model* model, Camera* camera, const Vector3& position)
 	// 速度を設定する
 	velocity_ = { 0.0f, 0.0f, -kWalkSpeed};
 
-	coolTimer_ = 0.0f;
+	coolTimer_ = kBulletCoolTime;
 	reloadTimer_ = 0.0f;
 
 	bulletRemain_ = kMaxBullet;
@@ -101,20 +101,26 @@ void Enemy::Draw()
 	}
 }
 
-void Enemy::Shot(const Vector3& velocity, const float& bulletCoolTime, const bool& isNeedReload) 
+void Enemy::Shot(const Vector3& velocity, const float& bulletCoolTime, const bool& isReloadable) 
 {
 	if (bulletRemain_ != 0) {
 		if (coolTimer_ == 0.0f) 
 		{
-			// 弾の生成
-			BulletManager::GetInstance()->CreateEnemyBullet(worldTransform_.translation_, velocity);
+			if (behavior_ == Enemy::Behavior::kGrappled)
+			{
+				// 弾の生成
+				BulletManager::GetInstance()->CreatePlayerBullet(worldTransform_.translation_, velocity);
+			}
+			else
+			{
+				// 弾の生成
+				BulletManager::GetInstance()->CreateEnemyBullet(worldTransform_.translation_, velocity);
+			}
+
+			
 
 			coolTimer_ = bulletCoolTime;
-			if (isNeedReload)
-			{
-				bulletRemain_--;
-
-			}
+			bulletRemain_--;
 			
 			if (bulletRemain_ == 0) {
 				reloadTimer_ = kReloadTime;
@@ -129,9 +135,11 @@ void Enemy::Shot(const Vector3& velocity, const float& bulletCoolTime, const boo
 		}
 	}
 
-	if (reloadTimer_ != 0.0f) {
+	if (reloadTimer_ != 0.0f && isReloadable) 
+	{
 		reloadTimer_ -= kDeltaTime;
-		if (reloadTimer_ < 0.0f) {
+		if (reloadTimer_ < 0.0f) 
+		{
 			reloadTimer_ = 0.0f;
 
 			bulletRemain_ = kMaxBullet;
@@ -139,7 +147,14 @@ void Enemy::Shot(const Vector3& velocity, const float& bulletCoolTime, const boo
 	}
 }
 
-void Enemy::OnCollision(const PlayerBullet* bullet) 
+void Enemy::ResetBulletStatus() 
+{
+	reloadTimer_ = 0.0f;
+	coolTimer_ = 0.0f;
+	bulletRemain_ = kMaxBullet;
+}
+
+void Enemy::OnCollision(const Bullet* bullet) 
 {
 	(void)bullet;
 
@@ -160,19 +175,6 @@ void Enemy::OnCollision(const Anchor* anchor)
 	behaviorRequest_ = Behavior::kGrappled;
 	isGrappled_ = true;
 	grappleAnchor_ = anchor;
-}
-
-void Enemy::OnCollision(const EnemyBullet* enemyBullet) 
-{ 
-	(void)enemyBullet;
-
-	if (behavior_ == Behavior::kGrappled)
-	{
-		isGrappledHit_ = true;
-		return;
-	}
-
-	behaviorRequest_ = Behavior::kDead;
 }
 
 void Enemy::OnCollision(const Enemy* enemy) 
@@ -243,6 +245,27 @@ void Enemy::BehaviorRootUpdate()
 	//float degree = kWalkMotionAngleStrat + (kWalkMotionAngleEnd - kWalkMotionAngleStrat) * ((param + 1.0f) / 2.0f);
 	//worldTransform_.rotation_.x = DegToRad(degree);
 
+	if (Length(player_->GetTranslation() - worldTransform_.translation_) <= 35.0f) 
+	{
+		isTarget_ = true;
+		Vector3 direction = player_->GetTranslation() - worldTransform_.translation_;
+
+		if (Length(direction) > 1e-8f)
+		{
+			float yaw = std::atan2(-direction.x, -direction.z);
+
+			// 上下（Pitch）：X軸回り（水平距離を使う）
+			float xz = std::sqrt(direction.x * direction.x + direction.z * direction.z);
+			float pitch = std::atan2(direction.y, xz);
+
+			// ひねり（Roll）：相手を見るだけなら0で十分なことが多い
+			float roll = 0.0f;
+
+
+			worldTransform_.rotation_ = { pitch, yaw, roll };
+		}
+	}
+
 	if (worldTransform_.translation_.z < 5.0f) 
 	{
 		behaviorRequest_ = Behavior::kDead;
@@ -253,7 +276,11 @@ void Enemy::BehaviorRootUpdate()
 
 	bulletVelocity = TransformNormal(bulletVelocity, worldTransform_.matWorld_);
 
-	Shot(bulletVelocity, kBulletCoolTime, false);
+	
+	if (isTarget_)
+	{
+		Shot(bulletVelocity, kBulletCoolTime, true);
+	}
 }
 
 void Enemy::BehaviorDeadUpdate() 
@@ -283,6 +310,7 @@ void Enemy::ChangeBehavior(Behavior behavior)
 	case Behavior::kDead:
 		// Attack状態の初期化処理
 		currentState_ = std::make_unique<EnemyStateDead>();
+		StageTime::GetInstance()->AddScore();
 		break;
 
 	case Behavior::kGrappled:
@@ -424,6 +452,9 @@ void EnemyStateGrappled::Initialize(Enemy* enemy)
 	assert(enemy->GetGrappleAnchor()); 
 
 	hitPoint_ = kMaxHitPoint;
+
+	enemy->ResetBulletStatus();
+	enemy->SetRotation(Vector3{0.0f, 0.0f, 0.0f});
 }
 
 void EnemyStateGrappled::Update(Enemy* enemy) 
@@ -440,6 +471,18 @@ void EnemyStateGrappled::Update(Enemy* enemy)
 
 		enemy->SetTranslation(enemy->GetGrappleAnchor()->GetWorldPosition() 
 			+ TransformNormal({0.0f, 0.0f, enemy->GetWidth() / 2.0f}, enemy->GetGrappleAnchor()->GetWorldMatrix())); 
+
+		if (enemy->GetGrappleAnchor()->GetIsShotEnemyBullet())
+		{
+			// 弾の速度
+			Vector3 bulletVelocity(0, 0, kBulletSpeed);
+
+			bulletVelocity = TransformNormal(bulletVelocity, enemy->GetWorldMatrix());
+
+			
+			enemy->Shot(bulletVelocity, kBulletCoolTime, false);
+			
+		}
 
 		break;
 	}

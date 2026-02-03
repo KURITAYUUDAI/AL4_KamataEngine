@@ -1,5 +1,6 @@
 #include "ResultScene.h"
 #include "SpriteDraw.h"
+#include "StageTime.h"
 
 ResultScene::~ResultScene() 
 {
@@ -7,6 +8,8 @@ ResultScene::~ResultScene()
 	/*delete TEX1Sprite_;*/
 	delete TEX2Sprite_;
 	delete modelPlayer_;
+
+	StageTime::GetInstance()->Finalize();
 }
 
 void ResultScene::Initialize() {
@@ -110,6 +113,8 @@ void ResultScene::Draw()
 		SpriteDraw::GetInstance()->Draw(gameOverSprite_,
 			SRT2D{{1.0f, 1.0f}, 0.0f, {640.0f, 250.f}}, {0.5f, 0.5f}, {645.0f, 111.0f});
 
+		StageTime::GetInstance()->ResultDraw();
+
 		Sprite::PostDraw();
 
 		fade_->Draw();
@@ -128,6 +133,8 @@ void ResultScene::Draw()
 		SpriteDraw::GetInstance()->Draw(gameOverSprite_,
 			SRT2D{{1.0f, 1.0f}, 0.0f, {640.0f, 250.f}}, {0.5f, 0.5f}, {645.0f, 111.0f});
 
+		StageTime::GetInstance()->ResultDraw();
+
 		Sprite::PostDraw();
 
 		break;
@@ -140,6 +147,8 @@ void ResultScene::Draw()
 
 		SpriteDraw::GetInstance()->Draw(gameOverSprite_,
 			SRT2D{{1.0f, 1.0f}, 0.0f, {640.0f, 250.f}}, {0.5f, 0.5f}, {645.0f, 111.0f});
+
+		StageTime::GetInstance()->ResultDraw();
 
 		/*TEX1Sprite_->Draw();*/
 		TEX2Sprite_->Draw();

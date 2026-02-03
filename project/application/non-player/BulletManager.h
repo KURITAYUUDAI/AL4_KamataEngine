@@ -2,10 +2,11 @@
 #include "KamataEngine.h"
 #include "myMath.h"
 
-class EnemyBullet;
+class Bullet;
 
 class BulletManager 
 {
+
 public:
 	// シングルトンインスタンスの取得
 	static BulletManager* GetInstance();
@@ -14,7 +15,7 @@ public:
 
 public:
 	// 初期化
-	void Initialize(Model* model, Camera* camera);
+	void Initialize(Model* playerBulletModel, Model* enemyBulletModel, Camera* camera);
 
 	// 更新
 	void Update();
@@ -22,12 +23,17 @@ public:
 	// 描画
 	void Draw();
 
+	// 味方弾の生成
+	void CreatePlayerBullet(const Vector3& position, const Vector3& velocity);
+
 	// 敵弾の生成
 	void CreateEnemyBullet(const Vector3& position, const Vector3& velocity);
 
 public:  // 外部入出力
 
-	std::list<EnemyBullet*>& GetBullets() { return enemyBullets_; }
+	std::list<Bullet*>& GetBullets() { return bullets_; }
+
+
 
 	const Matrix4x4 GetBillboardWorldMatrix(const Vector3& scale, const Vector3& translate) const;
 
@@ -42,16 +48,19 @@ private: // シングルトンインスタンス
 private:
 
 	// モデル
+	Model* modelPlayerBullet_ = nullptr;
+
+	// モデル
 	Model* modelEnemyBullet_ = nullptr;
 
 	// カメラ
 	Camera* camera_ = nullptr;
 
 	// 弾のコンテナ
-	std::list<EnemyBullet*> enemyBullets_;
+	std::list<Bullet*> bullets_;
 
-	// 弾の最大数
-	static inline const int kMaxEnemyBullet = 100;
+	// ワールドに存在できる弾の最大数
+	static inline const int kMaxBullet = 100;
 
 	// ビルボード行列
 	Matrix4x4 billboardMatrix_;

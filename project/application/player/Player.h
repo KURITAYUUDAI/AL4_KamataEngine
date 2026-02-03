@@ -11,9 +11,7 @@ class Player;
 
 class Anchor;
 
-class PlayerBullet;
-
-class EnemyBullet;
+class Bullet;
 
 class IPlayerState
 {
@@ -63,7 +61,7 @@ public:
 	/// </summary>
 	/// <param name = "model">モデル</param>
 	/// <param name = "textureHandle">テクスチャハンドル</param>
-	void Initialize(Model* model, Camera* camera, const Vector3& position, Model* modelBullet, Model* modelAnchor);
+	void Initialize(Model* model, Camera* camera, const Vector3& position, Model* modelAnchor);
 
 	/// <summary>
 	/// 更新
@@ -87,7 +85,7 @@ public:
 
 	void OnCollision(const Enemy* enemy);
 
-	void OnCollision(const EnemyBullet* bullet);
+	void OnCollision(const Bullet* bullet);
 
 public: // ビヘイビア関連
 
@@ -131,18 +129,9 @@ public:	// 外部入出力
 	// アンカー射出フラグ
 	void SetIsShotAnchor(bool isShot) { isShotAnchor_ = isShot; }
 
-
-	std::list<PlayerBullet*> GetBullets() { return bullets_; }
-	void DestroyBullet(PlayerBullet* bullet);
-
 	Anchor* GetAnchor() { return anchor_; }
 
 private:	// メンバ変数
-
-	std::list<PlayerBullet*> bullets_;
-
-	// 弾のモデル
-	Model* modelBullet_ = nullptr;
 
 	Anchor* anchor_ = nullptr;
 

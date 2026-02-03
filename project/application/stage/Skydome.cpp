@@ -24,6 +24,14 @@ void Skydome::Update()
 	// Skydomeの更新処理を書く
 	worldTransform_.rotation_.y += 0.001f; // ゆっくり回転
 
+	if (worldTransform_.rotation_.y > pi) {
+		worldTransform_.rotation_.y = worldTransform_.rotation_.y - 2.0f * pi;
+	} 
+	else if (worldTransform_.rotation_.y < -pi) 
+	{
+		worldTransform_.rotation_.y = worldTransform_.rotation_.y + 2.0f * pi;
+	}
+
 	// ワールド行列作成
 	worldTransform_.matWorld_ = MakeAffineMatrixB(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 

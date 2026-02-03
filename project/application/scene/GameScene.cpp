@@ -3,12 +3,12 @@
 #include <limits>
 #include "3d/AxisIndicator.h"
 
-#include "PlayerBullet.h"
 #include "Anchor.h"
 #include "SeedManager.h"
-#include "EnemyBullet.h"
+#include "Bullet.h"
 #include "BulletManager.h"
 #include "SpriteDraw.h"
+#include "StageTime.h"
 
 using namespace KamataEngine;
 
@@ -94,7 +94,7 @@ void GameScene::Initialize()
 	Vector3 playerPosition = { 0.0f, -4.0f, 0.0f };
 
 	// 自キャラの初期化
-	player_->Initialize(modelPlayer_, &camera_, playerPosition, modelPlayerBullet_, modelAnchor_);
+	player_->Initialize(modelPlayer_, &camera_, playerPosition, modelAnchor_);
 
 	hitPointSprites_.clear();
 	for (int i = 0; i < player_->GetHitPoint(); ++i)
@@ -102,6 +102,8 @@ void GameScene::Initialize()
 		Sprite* hitPointSprite = Sprite::Create(hitPointHandle, {0.0f, 0.0f});
 		hitPointSprites_.push_back(hitPointSprite);
 	}
+
+	StageTime::GetInstance()->Initialize();
 
 	respawnTimers_.clear();
 	respawnTimers_.push_back(2.0f);
@@ -123,7 +125,7 @@ void GameScene::Initialize()
 	//	enemies_.push_back(enemy);
 	//}
 
-	BulletManager::GetInstance()->Initialize(modelEnemyBullet_, &camera_);
+	BulletManager::GetInstance()->Initialize(modelPlayerBullet_, modelEnemyBullet_, &camera_);
 
 	fade_ = new Fade();
 	fade_->Initialize();
@@ -182,6 +184,7 @@ void GameScene::Update()
 			if (enemy->GetIsDead())
 			{
 				delete enemy;
+				StageTime::GetInstance()->AddScore();
 				return true;
 			}
 			return false;
@@ -228,21 +231,21 @@ void GameScene::Update()
 		// 自キャラの更新
 		player_->Update();
 
-		if (Input::GetInstance()->TriggerKey(DIK_F4)) 
-		{
-			Enemy* enemy = new Enemy();
+		//if (Input::GetInstance()->TriggerKey(DIK_F4)) 
+		//{
+		//	Enemy* enemy = new Enemy();
 
-			Vector3 pos = 
-			{
-				SeedManager::GetInstance()->GenerateFloat(-5.0f, 5.0f), 
-				SeedManager::GetInstance()->GenerateFloat(-5.0f, 5.0f), 
-				7.0f
-			};
+		//	Vector3 pos = 
+		//	{
+		//		SeedManager::GetInstance()->GenerateFloat(-5.0f, 5.0f), 
+		//		SeedManager::GetInstance()->GenerateFloat(-5.0f, 5.0f), 
+		//		7.0f
+		//	};
 
-			enemy->Initialize(modelEnemy_, &camera_, pos);
+		//	enemy->Initialize(modelEnemy_, &camera_, pos);
 
-			enemies_.push_back(enemy);
-		}
+		//	enemies_.push_back(enemy);
+		//}
 
 		RespawnEnemy();
 
@@ -318,6 +321,7 @@ void GameScene::Update()
 		enemies_.remove_if([](Enemy* enemy) {
 			if (enemy->GetIsDead()) {
 				delete enemy;
+				StageTime::GetInstance()->AddScore();
 				return true;
 			}
 			return false;
@@ -365,6 +369,7 @@ void GameScene::Update()
 		enemies_.remove_if([](Enemy* enemy) {
 			if (enemy->GetIsDead()) {
 				delete enemy;
+				StageTime::GetInstance()->AddScore();
 				return true;
 			}
 			return false;
@@ -406,7 +411,9 @@ void GameScene::Update()
 
 	}
 
-#ifdef DEBUG
+	StageTime::GetInstance()->Update();
+
+#ifdef _DEBUG
 
 	ImGui::Begin("game scene window");
 
@@ -462,17 +469,23 @@ void GameScene::Draw()
 		SpriteDraw::GetInstance()->Draw(HowToOperate1Sprite_, 
 			SRT2D{{1.0f, 1.0f}, 0.0f, {50.0f, 700.f}}, {0.0f, 1.0f}, {202.0f, 123.0f});
 
-		SpriteDraw::GetInstance()->Draw(HowToOperate2Sprite_, 
-			SRT2D{{1.0f, 1.0f}, 0.0f, {1180.0f, 700.f}}, {1.0f, 1.0f}, {280.0f, 58.0f});
+
+		if (player_->GetAnchor()->GetMode() == Anchor::Mode::kHold)
+		{
+			SpriteDraw::GetInstance()->Draw(HowToOperate2Sprite_, 
+				SRT2D{{1.0f, 1.0f}, 0.0f, {1180.0f, 700.f}}, {1.0f, 1.0f}, {280.0f, 58.0f});
+		}
 
 		SpriteDraw::GetInstance()->Draw(HowToOperate3Sprite_, 
-			SRT2D{{1.0f, 1.0f}, 0.0f, {600.0f, 700.f}}, {0.5f, 1.0f}, {306.0f, 65.0f});
+				SRT2D{{1.0f, 1.0f}, 0.0f, {600.0f, 700.f}}, {0.5f, 1.0f}, {306.0f, 65.0f});
 		
 		for (size_t i = 0; i < player_->GetHitPoint(); ++i)
 		{
 			SpriteDraw::GetInstance()->Draw(hitPointSprites_[i], 
 			SRT2D{{1.0f, 1.0f}, 0.0f, {50.0f + i * 32.0f, 50.f}}, {0.0f, 0.0f}, {29.0f, 29.0f});
 		}
+
+		StageTime::GetInstance()->Draw();
 
 		Sprite::PostDraw();
 
@@ -506,8 +519,11 @@ void GameScene::Draw()
 		SpriteDraw::GetInstance()->Draw(HowToOperate1Sprite_, 
 			SRT2D{{1.0f, 1.0f}, 0.0f, {50.0f, 700.f}}, {0.0f, 1.0f}, {202.0f, 123.0f});
 
-		SpriteDraw::GetInstance()->Draw(HowToOperate2Sprite_, 
-			SRT2D{{1.0f, 1.0f}, 0.0f, {1180.0f, 700.f}}, {1.0f, 1.0f}, {280.0f, 58.0f});
+		if (player_->GetAnchor()->GetMode() == Anchor::Mode::kHold)
+		{
+			SpriteDraw::GetInstance()->Draw(HowToOperate2Sprite_, 
+				SRT2D{{1.0f, 1.0f}, 0.0f, {1180.0f, 700.f}}, {1.0f, 1.0f}, {280.0f, 58.0f});
+		}
 
 		SpriteDraw::GetInstance()->Draw(HowToOperate3Sprite_, 
 			SRT2D{{1.0f, 1.0f}, 0.0f, {600.0f, 700.f}}, {0.5f, 1.0f}, {306.0f, 65.0f});
@@ -517,6 +533,8 @@ void GameScene::Draw()
 			SpriteDraw::GetInstance()->Draw(hitPointSprites_[i], 
 			SRT2D{{1.0f, 1.0f}, 0.0f, {50.0f + i * 32.0f, 50.f}}, {0.0f, 0.0f}, {29.0f, 29.0f});
 		}
+
+		StageTime::GetInstance()->Draw();
 
 		Sprite::PostDraw();
 
@@ -550,8 +568,11 @@ void GameScene::Draw()
 		SpriteDraw::GetInstance()->Draw(HowToOperate1Sprite_, 
 			SRT2D{{1.0f, 1.0f}, 0.0f, {50.0f, 700.f}}, {0.0f, 1.0f}, {202.0f, 123.0f});
 
-		SpriteDraw::GetInstance()->Draw(HowToOperate2Sprite_, 
-			SRT2D{{1.0f, 1.0f}, 0.0f, {1180.0f, 700.f}}, {1.0f, 1.0f}, {280.0f, 58.0f});
+		if (player_->GetAnchor()->GetMode() == Anchor::Mode::kHold)
+		{
+			SpriteDraw::GetInstance()->Draw(HowToOperate2Sprite_, 
+				SRT2D{{1.0f, 1.0f}, 0.0f, {1180.0f, 700.f}}, {1.0f, 1.0f}, {280.0f, 58.0f});
+		}
 
 		SpriteDraw::GetInstance()->Draw(HowToOperate3Sprite_, 
 			SRT2D{{1.0f, 1.0f}, 0.0f, {600.0f, 700.f}}, {0.5f, 1.0f}, {306.0f, 65.0f});
@@ -561,6 +582,8 @@ void GameScene::Draw()
 			SpriteDraw::GetInstance()->Draw(hitPointSprites_[i], 
 			SRT2D{{1.0f, 1.0f}, 0.0f, {50.0f + i * 32.0f, 50.f}}, {0.0f, 0.0f}, {29.0f, 29.0f});
 		}
+
+		StageTime::GetInstance()->Draw();
 
 		Sprite::PostDraw();
 
@@ -598,8 +621,11 @@ void GameScene::Draw()
 		SpriteDraw::GetInstance()->Draw(HowToOperate1Sprite_, 
 			SRT2D{{1.0f, 1.0f}, 0.0f, {50.0f, 700.f}}, {0.0f, 1.0f}, {202.0f, 123.0f});
 
-		SpriteDraw::GetInstance()->Draw(HowToOperate2Sprite_, 
-			SRT2D{{1.0f, 1.0f}, 0.0f, {1180.0f, 700.f}}, {1.0f, 1.0f}, {280.0f, 58.0f});
+		if (player_->GetAnchor()->GetMode() == Anchor::Mode::kHold)
+		{
+			SpriteDraw::GetInstance()->Draw(HowToOperate2Sprite_, 
+				SRT2D{{1.0f, 1.0f}, 0.0f, {1180.0f, 700.f}}, {1.0f, 1.0f}, {280.0f, 58.0f});
+		}
 
 		SpriteDraw::GetInstance()->Draw(HowToOperate3Sprite_, 
 			SRT2D{{1.0f, 1.0f}, 0.0f, {600.0f, 700.f}}, {0.5f, 1.0f}, {306.0f, 65.0f});
@@ -610,7 +636,7 @@ void GameScene::Draw()
 			SRT2D{{1.0f, 1.0f}, 0.0f, {50.0f + i * 32.0f, 50.f}}, {0.0f, 0.0f}, {29.0f, 29.0f});
 		}
 
-		
+		StageTime::GetInstance()->Draw();
 
 		/*EX1Sprite_->Draw();
 		EX2Sprite_->Draw();*/
@@ -683,6 +709,7 @@ void GameScene::RespawnEnemy() {
 						SeedManager::GetInstance()->GenerateInt(30, 35) * 1.0f
 					}
 				);
+				enemy->SetPlayer(player_);
 				enemies_.push_back(enemy);
 			}
 
@@ -757,14 +784,19 @@ void GameScene::CheckAllCollisions() {
 		AABB aabb1, aabb2;
 
 		// 自弾の座標
-		for (PlayerBullet* bullet : player_->GetBullets())
+		for (Bullet* bullet : BulletManager::GetInstance()->GetBullets())
 		{
+			if (bullet->GetID() != Bullet::ID::kPlayer)
+			{
+				continue;
+			}
+
 			aabb1 = bullet->GetAABB();
 
 			// 自キャラと敵Mob全ての当たり判定
 			for (Enemy* enemy : enemies_) 
 			{
-				if (enemy->IsCollisionDisabled()) 
+				if (enemy->GetIsCollisionDisabled()) 
 				{
 					// 衝突無効フラグが立っている場合はスキップ
 					continue;
@@ -803,7 +835,7 @@ void GameScene::CheckAllCollisions() {
 		// 自キャラと敵Mob全ての当たり判定
 		for (Enemy* enemy : enemies_) 
 		{
-			if (enemy->IsCollisionDisabled()) {
+			if (enemy->GetIsCollisionDisabled()) {
 				// 衝突無効フラグが立っている場合はスキップ
 				continue;
 			}
@@ -830,10 +862,17 @@ void GameScene::CheckAllCollisions() {
 		// 自キャラの座標
 		aabb1 = player_->GetAABB();
 		// 敵弾全ての当たり判定
-		for (EnemyBullet* bullet : BulletManager::GetInstance()->GetBullets()) {
+		for (Bullet* bullet : BulletManager::GetInstance()->GetBullets()) 
+		{
+			if (bullet->GetID() != Bullet::ID::kEnemy) 
+			{
+				continue;
+			}
+
 			aabb2 = bullet->GetAABB();
 			// AABB同士の交差判定
-			if (IsCollision(aabb1, aabb2)) {
+			if (IsCollision(aabb1, aabb2)) 
+			{
 				// 自キャラの衝突時間数を呼び出す
 				player_->OnCollision(bullet);
 				// 敵弾の衝突時関数を呼び出す
@@ -859,7 +898,13 @@ void GameScene::CheckAllCollisions() {
 			aabb1 = enemy->GetAABB();
 
 			// 敵弾全ての当たり判定
-			for (EnemyBullet* bullet : BulletManager::GetInstance()->GetBullets()) {
+			for (Bullet* bullet : BulletManager::GetInstance()->GetBullets()) 
+			{
+				if (bullet->GetID() != Bullet::ID::kEnemy) 
+				{
+					continue;
+				}
+
 				aabb2 = bullet->GetAABB();
 				// AABB同士の交差判定
 				if (IsCollision(aabb1, aabb2)) {
