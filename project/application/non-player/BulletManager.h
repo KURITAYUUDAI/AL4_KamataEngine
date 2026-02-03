@@ -33,9 +33,10 @@ public:  // 外部入出力
 
 	std::list<Bullet*>& GetBullets() { return bullets_; }
 
-
-
 	const Matrix4x4 GetBillboardWorldMatrix(const Vector3& scale, const Vector3& translate) const;
+
+public:
+	void PlaySEShot();
 
 private: // シングルトンインスタンス
 	static BulletManager* instance_;
@@ -64,4 +65,10 @@ private:
 
 	// ビルボード行列
 	Matrix4x4 billboardMatrix_;
+
+private:
+
+	uint32_t shotSEDataHandle_;
+	uint32_t shotSEHandle_;
+	bool isPlayShotSE_;
 };

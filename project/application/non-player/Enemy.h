@@ -62,14 +62,14 @@ public:
 	/// </summary>
 	void Draw();
 
-	void Shot(const Vector3& velocity, const float& bulletCoolTime, const bool& isNeedReload);
+	void Shot(const Vector3& velocity, const float& bulletCoolTime, const bool& isNeedReload, const bool& isShot);
 
 	void ResetBulletStatus();
 
 public: // 衝突応答
 	/*void OnCollision(const Player* player);*/
 
-	void OnCollision(const Anchor* anchor);
+	void OnCollision(Anchor* anchor);
 
 	void OnCollision(const Bullet* enemyBullet);
 
@@ -120,7 +120,7 @@ public:
 	bool GetIsGrappled() const { return isGrappled_; }
 
 	// 捕まったアンカー
-	const Anchor* GetGrappleAnchor() const { return grappleAnchor_; }
+	Anchor* GetGrappleAnchor() { return grappleAnchor_; }
 	
 	bool GetIsCollisionDisabled() const { return isCollisionDisabled_; }
 
@@ -144,6 +144,10 @@ public:
 public:
 
 	static GameScene* gameScene_;
+
+public:
+	void PlaySEHit();
+	void PlaySEDead();
 
 private:
 
@@ -196,7 +200,7 @@ private:
 	bool isGrappled_ = false;
 
 	// 掴まれ時のアンカーのポインタ
-	const Anchor* grappleAnchor_ = nullptr;
+	Anchor* grappleAnchor_ = nullptr;
 
 	// 掴まれ時の被弾判定
 	bool isGrappledHit_ = false;
@@ -224,6 +228,19 @@ private:
 
 
 	bool isTarget_ = false;
+
+private:
+
+	
+	uint32_t hitSEDataHandle_;
+	uint32_t hitSEHandle_;
+	bool isPlayHitSE_;
+
+	uint32_t deadSEDataHandle_;
+	uint32_t deadSEHandle_;
+	bool isPlayDeadSE_;
+
+
 };
 
 class EnemyStateRoot : public IEnemyState 

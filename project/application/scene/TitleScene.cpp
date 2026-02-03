@@ -35,6 +35,9 @@ void TitleScene::Initialize()
 	// カメラの初期化
 	camera_.farZ = 1000.0f;
 	camera_.Initialize();
+
+	decisionSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/decision.wav");
+	isPlayDecisionSE_ = false;
 }
 
 void TitleScene::Update() 
@@ -67,6 +70,7 @@ void TitleScene::Update()
 		{
 			phase_ = Phase::kFadeOut;
 			fade_->Start(Fade::Status::FadeOut, 1.0f);
+			PlaySEDecision();
 		}
 
 		break;
@@ -154,4 +158,12 @@ void TitleScene::Draw()
 	}
 
 	
+}
+
+void TitleScene::PlaySEDecision() 
+{
+	if (!isPlayDecisionSE_) {
+		decisionSEHandle_ = Audio::GetInstance()->PlayWave(decisionSEDataHandle_, false, 0.4f);
+		isPlayDecisionSE_ = true;
+	}
 }

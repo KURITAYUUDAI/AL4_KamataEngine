@@ -69,6 +69,14 @@ public: // 外部入出力
 	void SetIsShotEnemyBullet(bool isShot) { isShotEnemyBullet_ = isShot; }
 	void SetIsShoot(bool isShoot) { isShoot_ = isShoot; }
 
+	void DeadHoldEnemy() { mode_ = Mode::kWait; } 
+
+public:
+
+	void PlaySEShot();
+	void PlaySEHit();
+	void PlaySEShoot();
+
 private:
 	WorldTransform worldTransform_;
 
@@ -118,4 +126,18 @@ private:
 	int32_t deathTimer_ = kLifeTime;
 	//	終了フラグ
 	bool isFinished_ = false;
+
+private:
+
+	uint32_t shotSEDataHandle_;
+	uint32_t shotSEHandle_;
+	bool isPlayShotSE_;
+
+	uint32_t hitSEDataHandle_;
+	uint32_t hitSEHandle_;
+	bool isPlayHitSE_;
+
+	uint32_t shootSEDataHandle_;
+	uint32_t shootSEHandle_;
+	bool isPlayShootSE_;
 };

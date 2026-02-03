@@ -977,3 +977,4 @@ void GameScene::ChangePhase()
 			break;
 	}
 }
+

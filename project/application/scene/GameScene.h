@@ -80,6 +80,9 @@ public:
 	// デスフラグのgetter
 	bool IsFinished() const { return finished_; }
 
+public:
+	void PlaySEDecision();
+
 private:
 
 	// テクスチャハンドル
@@ -138,4 +141,6 @@ private:
 	//Sprite* EX1Sprite_ = Sprite::Create(EX1Handle, {0.0f, 0.0f});
 	//Sprite* EX2Sprite_ = Sprite::Create(EX2Handle, {1090.0f, 0.0f});
 	//Sprite* BGSprite_ = Sprite::Create(BGHandle, {0.0f, 0.0f});
+
+
 };

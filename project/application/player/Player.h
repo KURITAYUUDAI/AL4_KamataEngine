@@ -131,6 +131,10 @@ public:	// 外部入出力
 
 	Anchor* GetAnchor() { return anchor_; }
 
+public:
+	void PlaySEHit();
+	void PlaySEDead();
+
 private:	// メンバ変数
 
 	Anchor* anchor_ = nullptr;
@@ -211,6 +215,18 @@ private:
 	Behavior behavior_ = Behavior::kRoot;
 
 	Behavior behaviorRequest_ = Behavior::kUnknown;
+
+private:
+
+	uint32_t hitSEDataHandle_;
+	uint32_t hitSEHandle_;
+	bool isPlayHitSE_;
+
+	uint32_t deadSEDataHandle_;
+	uint32_t deadSEHandle_;
+	bool isPlayDeadSE_;
+
+
 };
 
 class PlayerStateRoot : public IPlayerState 

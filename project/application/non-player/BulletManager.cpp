@@ -28,6 +28,8 @@ void BulletManager::Initialize(Model* playerBulletModel, Model* enemyBulletModel
 	modelPlayerBullet_ = playerBulletModel;
 	modelEnemyBullet_ = enemyBulletModel;
 	camera_ = camera;
+
+	shotSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/shotBullet.wav");
 }
 
 void BulletManager::Update() {
@@ -70,6 +72,9 @@ void BulletManager::CreatePlayerBullet(const Vector3& position, const Vector3& v
 	Bullet* bullet = new Bullet;
 	bullet->Initialize(modelPlayerBullet_, camera_, position, velocity, Bullet::ID::kPlayer);
 	bullets_.push_back(bullet);
+
+	PlaySEShot();
+	isPlayShotSE_ = false;
 }
 
 void BulletManager::CreateEnemyBullet(const Vector3& position, const Vector3& velocity) 
@@ -81,6 +86,9 @@ void BulletManager::CreateEnemyBullet(const Vector3& position, const Vector3& ve
 	Bullet* bullet = new Bullet;
 	bullet->Initialize(modelEnemyBullet_, camera_, position, velocity, Bullet::ID::kEnemy);
 	bullets_.push_back(bullet);
+
+	PlaySEShot();
+	isPlayShotSE_ = false;
 }
 
 const Matrix4x4 BulletManager::GetBillboardWorldMatrix(const Vector3& scale, const Vector3& translate) const
@@ -91,4 +99,13 @@ const Matrix4x4 BulletManager::GetBillboardWorldMatrix(const Vector3& scale, con
 	Matrix4x4 worldMatrix = scaleMatrix * billboardMatrix_ * translateMatrix;
 
 	return worldMatrix;
+}
+
+void BulletManager::PlaySEShot()
+{
+	if (!isPlayShotSE_)
+	{
+		shotSEHandle_ = Audio::GetInstance()->PlayWave(shotSEDataHandle_, false, 0.1f);
+		isPlayShotSE_ = true;
+	}
 }

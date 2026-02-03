@@ -45,6 +45,9 @@ void Enemy::Initialize(Model* model, Camera* camera, const Vector3& position)
 
 	// モード変更
 	ChangeBehavior(behaviorRequest_);
+
+	hitSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/hitEnemy.wav");
+	deadSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/deadEnemy.wav");
 }
 
 void Enemy::Update()
@@ -66,6 +69,7 @@ void Enemy::Update()
 	if (damageTimer_ < 0.0f) 
 	{
 		damageTimer_ = 0.0f;
+		isPlayHitSE_ = false;
 	}
 
 	if (worldTransform_.translation_.z)
@@ -101,29 +105,27 @@ void Enemy::Draw()
 	}
 }
 
-void Enemy::Shot(const Vector3& velocity, const float& bulletCoolTime, const bool& isReloadable) 
+void Enemy::Shot(const Vector3& velocity, const float& bulletCoolTime, const bool& isReloadable, const bool& isShot) 
 {
 	if (bulletRemain_ != 0) {
 		if (coolTimer_ == 0.0f) 
 		{
-			if (behavior_ == Enemy::Behavior::kGrappled)
+			if (isShot)
 			{
-				// 弾の生成
-				BulletManager::GetInstance()->CreatePlayerBullet(worldTransform_.translation_, velocity);
-			}
-			else
-			{
-				// 弾の生成
-				BulletManager::GetInstance()->CreateEnemyBullet(worldTransform_.translation_, velocity);
-			}
+				if (behavior_ == Enemy::Behavior::kGrappled) {
+					// 弾の生成
+					BulletManager::GetInstance()->CreatePlayerBullet(worldTransform_.translation_, velocity);
+				} else {
+					// 弾の生成
+					BulletManager::GetInstance()->CreateEnemyBullet(worldTransform_.translation_, velocity);
+				}
 
-			
+				coolTimer_ = bulletCoolTime;
+				bulletRemain_--;
 
-			coolTimer_ = bulletCoolTime;
-			bulletRemain_--;
-			
-			if (bulletRemain_ == 0) {
-				reloadTimer_ = kReloadTime;
+				if (bulletRemain_ == 0) {
+					reloadTimer_ = kReloadTime;
+				}
 			}
 		}
 	}
@@ -162,15 +164,21 @@ void Enemy::OnCollision(const Bullet* bullet)
 	{
 		hitPoint_--;
 		damageTimer_ = kDamageInvincible_;
+		PlaySEHit();
 	}
 	if (hitPoint_ <= 0)
 	{
 		behaviorRequest_ = Behavior::kDead;
+		PlaySEDead();
+		if (GetGrappleAnchor())
+		{
+			GetGrappleAnchor()->DeadHoldEnemy();
+		}
 		return;
 	}
 }
 
-void Enemy::OnCollision(const Anchor* anchor) 
+void Enemy::OnCollision(Anchor* anchor) 
 { 
 	behaviorRequest_ = Behavior::kGrappled;
 	isGrappled_ = true;
@@ -182,6 +190,7 @@ void Enemy::OnCollision(const Enemy* enemy)
 	(void)enemy; 
 	if (behavior_ == Behavior::kShoot) 
 	{
+		behaviorRequest_ = Behavior::kDead;
 		return;
 	}
 
@@ -192,6 +201,7 @@ void Enemy::OnCollision(const Enemy* enemy)
 	}
 	if (hitPoint_ <= 0) {
 		behaviorRequest_ = Behavior::kDead;
+		PlaySEDead();
 		return;
 	}
 }
@@ -269,6 +279,7 @@ void Enemy::BehaviorRootUpdate()
 	if (worldTransform_.translation_.z < 5.0f) 
 	{
 		behaviorRequest_ = Behavior::kDead;
+		PlaySEDead();
 	}
 
 	// 弾の速度
@@ -277,10 +288,9 @@ void Enemy::BehaviorRootUpdate()
 	bulletVelocity = TransformNormal(bulletVelocity, worldTransform_.matWorld_);
 
 	
-	if (isTarget_)
-	{
-		Shot(bulletVelocity, kBulletCoolTime, true);
-	}
+	
+	Shot(bulletVelocity, kBulletCoolTime, true, isTarget_);
+	
 }
 
 void Enemy::BehaviorDeadUpdate() 
@@ -472,17 +482,15 @@ void EnemyStateGrappled::Update(Enemy* enemy)
 		enemy->SetTranslation(enemy->GetGrappleAnchor()->GetWorldPosition() 
 			+ TransformNormal({0.0f, 0.0f, enemy->GetWidth() / 2.0f}, enemy->GetGrappleAnchor()->GetWorldMatrix())); 
 
-		if (enemy->GetGrappleAnchor()->GetIsShotEnemyBullet())
-		{
-			// 弾の速度
-			Vector3 bulletVelocity(0, 0, kBulletSpeed);
+		
+		// 弾の速度
+		Vector3 bulletVelocity(0, 0, kBulletSpeed);
 
-			bulletVelocity = TransformNormal(bulletVelocity, enemy->GetWorldMatrix());
+		bulletVelocity = TransformNormal(bulletVelocity, enemy->GetWorldMatrix());
+			
+		
 
-			
-			enemy->Shot(bulletVelocity, kBulletCoolTime, false);
-			
-		}
+		enemy->Shot(bulletVelocity, kBulletCoolTime, false, enemy->GetGrappleAnchor()->GetIsShotEnemyBullet());
 
 		break;
 	}
@@ -546,4 +554,23 @@ void EnemyStateShoot::Draw(Enemy* enemy)
 void EnemyStateShoot::Shutdown(Enemy* enemy) 
 { 
 	(void)enemy; 
+}
+
+void Enemy::PlaySEHit() 
+{
+	if (!isPlayHitSE_) 
+	{
+		hitSEHandle_ = Audio::GetInstance()->PlayWave(hitSEDataHandle_, false, 0.2f);
+		isPlayHitSE_ = true;
+	}
+}
+
+void Enemy::PlaySEDead() 
+{ 
+	if (!isPlayDeadSE_)
+	{
+		deadSEHandle_ = Audio::GetInstance()->PlayWave(deadSEDataHandle_, false, 0.4f);
+		isPlayDeadSE_ = true;
+	}
+	
 }

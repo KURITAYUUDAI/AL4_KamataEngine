@@ -25,6 +25,11 @@ void Anchor::Initialize(
 	mode_ = Anchor::Mode::kWait;
 
 	velocity_ = velocity;
+
+	shotSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/shotAnchor.wav");
+	hitSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/hitAnchor.wav");
+	shootSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/shootAnchor.wav");
+
 }
 
 void Anchor::Update() 
@@ -51,6 +56,7 @@ void Anchor::Update()
 		if (length_ >= kMaxLength)
 		{
 			mode_ = Anchor::Mode::kBack;
+			isPlayShotSE_ = false;
 		}
 
 		break;
@@ -72,6 +78,8 @@ void Anchor::Update()
 			isFinished_ = true;
 		}
 
+		isPlayShotSE_ = false;
+
 		break;
 
 	case Anchor::Mode::kGrapple:
@@ -90,9 +98,13 @@ void Anchor::Update()
 			isFinished_ = true;
 		}
 
+		isPlayShotSE_ = false;
+
 		break;
 
 	case Anchor::Mode::kHold:
+
+		isPlayHitSE_ = false;
 
 		worldTransform_.rotation_ = player_->GetRotation();
 		worldTransform_.translation_ = player_->GetTranslation() + TransformNormal({0.0f, 0.0f, 1.0f}, worldTransform_.matWorld_);
@@ -167,6 +179,7 @@ void Anchor::OnCollision(const Enemy* enemy)
 { 
 	(void)enemy; 
 	mode_ = Anchor::Mode::kGrapple;
+	PlaySEHit();
 }
 
 void Anchor::Shot() 
@@ -180,11 +193,13 @@ void Anchor::Shoot(const Vector3& velocity)
 	if (mode_ == Anchor::Mode::kHold)
 	{
 		isShoot_ = true;
-
+		PlaySEShoot();
+		isPlayShootSE_ = false;
 		return;
 	}
 
 	mode_ = Anchor::Mode::kFoward; 
+	PlaySEShot();
 
 	velocity_ = velocity;
 }
@@ -212,4 +227,31 @@ AABB Anchor::GetAABB()
 	aabb.max = {worldPos.x + size_.x, worldPos.y + size_.y, worldPos.z + size_.z};
 
 	return aabb;
+}
+
+void Anchor::PlaySEShot() { 
+	if (!isPlayShotSE_)
+	{
+		shotSEHandle_ = Audio::GetInstance()->PlayWave(shotSEDataHandle_, false, 0.4f);
+		isPlayShotSE_ = true;
+	}
+	
+}
+
+void Anchor::PlaySEHit() 
+{
+	if (!isPlayHitSE_) 
+	{
+		hitSEHandle_ = Audio::GetInstance()->PlayWave(hitSEDataHandle_, false, 0.2f);
+		isPlayHitSE_ = true;
+	}
+}
+
+void Anchor::PlaySEShoot() 
+{
+	if (!isPlayShootSE_) 
+	{
+		shootSEHandle_ = Audio::GetInstance()->PlayWave(shootSEDataHandle_, false, 0.2f);
+		isPlayShootSE_ = true;
+	}
 }

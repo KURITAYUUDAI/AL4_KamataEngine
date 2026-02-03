@@ -36,6 +36,9 @@ void ResultScene::Initialize() {
 	// カメラの初期化
 	camera_.farZ = 1000.0f;
 	camera_.Initialize();
+
+	decisionSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/decision.wav");
+	isPlayDecisionSE_ = false;
 }
 
 void ResultScene::Update() {
@@ -64,6 +67,7 @@ void ResultScene::Update() {
 		if (Input::GetInstance()->PushKey(DIK_SPACE)) {
 			phase_ = Phase::kFadeOut;
 			fade_->Start(Fade::Status::FadeOut, 1.0f);
+			PlaySEDecision();
 		}
 
 		break;
@@ -158,5 +162,13 @@ void ResultScene::Draw()
 		fade_->Draw();
 
 		break;
+	}
+}
+
+void ResultScene::PlaySEDecision() 
+{
+	if (!isPlayDecisionSE_) {
+		decisionSEHandle_ = Audio::GetInstance()->PlayWave(decisionSEDataHandle_, false, 0.4f);
+		isPlayDecisionSE_ = true;
 	}
 }

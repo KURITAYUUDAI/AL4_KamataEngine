@@ -40,6 +40,8 @@ public:
 	// 天球
 	Skydome* skydome_ = nullptr;
 
+public:
+	void PlaySEDecision();
 
 private:
 
@@ -67,5 +69,10 @@ private:
 
 	// 天球モデル
 	Model* modelSkydome_ = nullptr;
+
+private:
+	uint32_t decisionSEDataHandle_;
+	uint32_t decisionSEHandle_;
+	bool isPlayDecisionSE_;
 
 };

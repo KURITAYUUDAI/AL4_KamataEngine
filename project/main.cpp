@@ -62,6 +62,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	// リザルトシーンの初期化
 	resultScene->Initialize();
 
+	static uint32_t bgmDataHandle_;
+	static uint32_t bgmHandle_;
+	bool isPlayBgm_ = false;
+
+	bgmDataHandle_ = Audio::GetInstance()->LoadWave("SE/bgmGameScene.wav");
+	
+	if (bgmHandle_ == 0 || !Audio::GetInstance()->IsPlaying(bgmHandle_)) 
+	{
+		bgmHandle_ = Audio::GetInstance()->PlayWave(bgmDataHandle_, true, 0.05f);
+	}
+
+	isPlayBgm_ = true;
+
 	// メインループ
 	while (true)
 	{
@@ -106,6 +119,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		// 描画終了
 		dxCommon->PostDraw();
 
+	}
+
+	if (bgmHandle_ != 0 && Audio::GetInstance()->IsPlaying(bgmHandle_)) {
+		Audio::GetInstance()->StopWave(bgmHandle_);
+		bgmHandle_ = 0; // ハンドルをリセット
 	}
 
 	// 解放処理

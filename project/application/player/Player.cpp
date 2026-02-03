@@ -51,6 +51,9 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position,  
 
 	// モード変更
 	ChangeBehavior(behaviorRequest_);
+
+	hitSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/hitPlayer.wav");
+	deadSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/deadPlayer.wav");
 }
 
 void Player::Update() 
@@ -75,6 +78,7 @@ void Player::Update()
 	if (damageTimer_ < 0.0f) 
 	{
 		damageTimer_ = 0.0f;
+		isPlayHitSE_ = false;
 	}
 
 	anchor_->Update();
@@ -270,10 +274,12 @@ void Player::OnCollision(const Enemy* enemy)
 	{
 		hitPoint_--;
 		damageTimer_ = kDamageInvincible_;
+		PlaySEHit();
 	}
 	if (hitPoint_ <= 0) 
 	{
 		isDead_ = true;
+		PlaySEDead();
 	}
 }
 
@@ -286,10 +292,12 @@ void Player::OnCollision(const Bullet* bullet)
 	{
 		hitPoint_--;
 		damageTimer_ = kDamageInvincible_;
+		PlaySEHit();
 	}
 	if (hitPoint_ <= 0)
 	{
 		isDead_ = true;
+		PlaySEDead();
 	}
 }
 
@@ -363,3 +371,18 @@ void PlayerStateRoot::Shutdown(Player* player)
 {
 	player = player;
 }
+
+void Player::PlaySEHit() {
+	if (!isPlayHitSE_) {
+		hitSEHandle_ = Audio::GetInstance()->PlayWave(hitSEDataHandle_, false, 0.2f);
+		isPlayHitSE_ = true;
+	}
+}
+
+void Player::PlaySEDead() {
+	if (!isPlayDeadSE_) {
+		deadSEHandle_ = Audio::GetInstance()->PlayWave(deadSEDataHandle_, false, 0.4f);
+		isPlayDeadSE_ = true;
+	}
+}
+
