@@ -302,7 +302,9 @@ void GameScene::Update()
 			deathParticles_->Initialize(modelDeathParticle_, &camera_, deathParticlesPosition);
 		}
 
-		if (Input::GetInstance()->PushKey(DIK_F3)) {
+
+
+		if (StageTime::GetInstance()->TimeUp()) {
 			phase_ = Phase::kFadeOut;
 			fade_->Start(Fade::Status::FadeOut, 1.0f);
 		}

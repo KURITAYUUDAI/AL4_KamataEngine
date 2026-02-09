@@ -56,11 +56,13 @@ private:
 	/*uint32_t TEX1Handle = TextureManager::Load("Sprite/TEX1.png");*/
 	uint32_t TEX2Handle = TextureManager::Load("Sprite/TEX2.png");
 	uint32_t titleHandle = TextureManager::Load("Sprite/title.png");
+	uint32_t creditHandle = TextureManager::Load("Sprite/credit2.png");
 
 	// Sprite作成
 	/*Sprite* TEX1Sprite_ = Sprite::Create(TEX1Handle, {0.0f, 0.0f});*/
 	Sprite* TEX2Sprite_ = Sprite::Create(TEX2Handle, {0.0f, 0.0f});
 	Sprite* titleSprite_ = Sprite::Create(titleHandle, {0.0f, 0.0f});
+	Sprite* creditSprite_ = Sprite::Create(creditHandle, {0.0f, 0.0f});
 
 	// 自キャラモデル
 	Model* modelPlayer_ = nullptr;

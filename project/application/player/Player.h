@@ -200,7 +200,7 @@ private:
 	// HP
 	int hitPoint_;
 	// 最大HP
-	static inline const int kMaxHitPoint = 5;
+	static inline const int kMaxHitPoint = 3;
 
 	float damageTimer_;
 	const float kDamageInvincible_ = 1.0f;

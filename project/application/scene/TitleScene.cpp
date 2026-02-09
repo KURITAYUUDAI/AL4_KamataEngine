@@ -7,6 +7,7 @@ TitleScene::~TitleScene()
 	/*delete TEX1Sprite_;*/
 	delete TEX2Sprite_;
 	delete titleSprite_;
+	delete creditSprite_;
 	delete modelPlayer_;
 }
 
@@ -120,6 +121,9 @@ void TitleScene::Draw()
 		TEX2Sprite_->Draw();
 		titleSprite_->Draw();
 
+		SpriteDraw::GetInstance()->Draw(creditSprite_,
+			SRT2D{{1.0f, 1.0f}, 0.0f, {1270.0f, 710.0f}}, {1.0f, 1.0f}, {402.0f, 27.0f});
+
 		Sprite::PostDraw();
 
 		fade_->Draw();
@@ -131,6 +135,9 @@ void TitleScene::Draw()
 		skydome_->Draw();
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
+
+		SpriteDraw::GetInstance()->Draw(creditSprite_,
+			SRT2D{{1.0f, 1.0f}, 0.0f, {1270.0f, 710.0f}}, {1.0f, 1.0f}, {402.0f, 27.0f});
 
 		/*TEX1Sprite_->Draw();*/
 		TEX2Sprite_->Draw();
@@ -145,6 +152,9 @@ void TitleScene::Draw()
 		skydome_->Draw();
 
 		Sprite::PreDraw(dxCommon->GetCommandList());
+
+		SpriteDraw::GetInstance()->Draw(creditSprite_,
+			SRT2D{{1.0f, 1.0f}, 0.0f, {1270.0f, 710.0f}}, {1.0f, 1.0f}, {402.0f, 27.0f});
 
 		/*TEX1Sprite_->Draw();*/
 		TEX2Sprite_->Draw();

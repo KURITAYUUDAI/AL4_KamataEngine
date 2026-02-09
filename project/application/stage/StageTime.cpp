@@ -33,6 +33,7 @@ void StageTime::Initialize()
 {
 	TimeSprite_ = Sprite::Create(timeHandle, {0.0f, 0.0f});
 	ScoreSprite_ = Sprite::Create(scoreHandle, {0.0f, 0.0f});
+	TimeUpSprite_ = Sprite::Create(timeUpHandle, {0.0f, 0.0f});
 
 	time_ = kMaxTime;
 
@@ -47,14 +48,56 @@ void StageTime::Initialize()
 		Sprite* numberSprite = Sprite::Create(numberHandle, {0.0f, 0.0f});
 		numberScoreSprites_.push_back(numberSprite);
 	}
+
+	timeUpSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/timeUp.wav");
+
+	timeUp_ = false;
 }
 
 void StageTime::Update()
 {
-	time_ -= kDeltaTime;
+	if (time_ > 0.0f)
+	{
+		time_ -= kDeltaTime;
+	} 
+	else
+	{
+		if (timeUpTimer_ == 0.0f)
+		{
+			timeUpTimer_ = kMaxTimeUp;
+			timeUp_ = true;
+		}
+		
+	}
 
 	SetTimeDigit();
 	SetScpreDigit();
+
+	if (timeUp_ && timeUpTimer_ > 0.0f)
+	{
+		if (timeUpTimer_ == 2.0f)
+		{
+			PlaySETimeUp();
+			isPlayTimeUpSE_ = false;
+		} 
+		else if (timeUpTimer_ <= 1.0f)
+		{
+			PlaySETimeUp();
+		}
+		timeUpTimer_ -= kDeltaTime;
+		
+	} 
+
+#ifdef _DEBUG
+
+	ImGui::Begin("stage time window");
+
+	ImGui::DragFloat("timeUpTimer", &timeUpTimer_, 0.0f);
+
+	ImGui::End();
+
+#endif
+	
 }
 
 void StageTime::Draw()
@@ -78,6 +121,13 @@ void StageTime::Draw()
 			SRT2D{{1.0f, 1.0f}, 0.0f, {170.0f + (i * 20.0f), 150.0f}}, 
 			{20.0f, 28.0f}, {20.0f * static_cast<float>(scoreDigits_[i]) , 0.0f}, {20.0f, 28.0f});
 	}
+
+	if (static_cast<int>(timeUpTimer_ * 60.0f) % 60 >= 29 && timeUp_)
+	{
+		spriteDraw_->Draw(TimeUpSprite_,
+			SRT2D{{1.0f, 1.0f}, 0.0f, {640.0f, 300.0f}}, {0.5f, 0.5f}, {573.0f, 124.0f});
+	}
+
 }
 
 void StageTime::SetTimeDigit() 
@@ -140,5 +190,24 @@ void StageTime::ResultDraw()
 		spriteDraw_->DrawSpriteSheet(numberScoreSprites_[i], 
 			SRT2D{{2.0f, 2.0f}, 0.0f, {640.0f + (i * 40.0f), 400.0f}}, 
 			{20.0f, 28.0f}, {20.0f * static_cast<float>(scoreDigits_[i]) , 0.0f}, {20.0f, 28.0f});
+	}
+}
+
+const bool StageTime::TimeUp() 
+{ 
+	if (timeUpTimer_ <= 1.0f && timeUp_) 
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void StageTime::PlaySETimeUp() 
+{
+	if (!isPlayTimeUpSE_) 
+	{
+		timeUpSEHandle_ = Audio::GetInstance()->PlayWave(timeUpSEDataHandle_, false, 0.2f);
+		isPlayTimeUpSE_ = true;
 	}
 }

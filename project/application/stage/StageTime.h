@@ -29,6 +29,12 @@ public:
 
 	void ResultDraw();
 
+public:
+
+	const bool TimeUp();
+
+	void PlaySETimeUp();
+
 private: // シングルトンインスタンス
 	static StageTime* instance_;
 
@@ -45,6 +51,14 @@ private:
 	uint32_t timeHandle = TextureManager::Load("Sprite/Time.png");
 	uint32_t scoreHandle = TextureManager::Load("Sprite/Score.png");
 	uint32_t numberHandle = TextureManager::Load("SpriteSheet/number.png");
+	uint32_t timeUpHandle = TextureManager::Load("Sprite/timeUp.png");
+
+private:
+
+	uint32_t timeUpSEDataHandle_;
+	uint32_t timeUpSEHandle_;
+	bool isPlayTimeUpSE_;
+
 
 private:
 
@@ -58,6 +72,14 @@ private:
 	Sprite* TimeSprite_ = nullptr;
 
 	std::vector<Sprite*> numberTimeSprites_;
+
+	Sprite* TimeUpSprite_ = nullptr;
+
+	float timeUpTimer_;
+
+	const float kMaxTimeUp = 2.0f;
+
+	bool timeUp_ = false;
 
 private:
 
