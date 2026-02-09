@@ -52,6 +52,8 @@ void StageTime::Initialize()
 	timeUpSEDataHandle_ = Audio::GetInstance()->LoadWave("SE/timeUp.wav");
 
 	timeUp_ = false;
+
+	score_ = 10000.0f;
 }
 
 void StageTime::Update()
@@ -91,6 +93,11 @@ void StageTime::Update()
 #ifdef _DEBUG
 
 	ImGui::Begin("stage time window");
+
+	ImGui::DragFloat("time", &time_, 0.0f);
+
+
+	ImGui::Text("time Digit %d, %d, %d", timeDigits_[0], timeDigits_[1], timeDigits_[2]);
 
 	ImGui::DragFloat("timeUpTimer", &timeUpTimer_, 0.0f);
 
@@ -132,6 +139,11 @@ void StageTime::Draw()
 
 void StageTime::SetTimeDigit() 
 { 
+	// 0. 桁を初期化
+	timeDigits_[0] = 0;
+	timeDigits_[1] = 0;
+	timeDigits_[2] = 0;
+
 	// 1. 整数部を取り出す
 	long long ip = static_cast<long long>(std::fabs(time_)); 
 	

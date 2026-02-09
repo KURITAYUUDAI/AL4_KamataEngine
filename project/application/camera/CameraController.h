@@ -18,6 +18,8 @@ class CameraController
 		float top = 1.0f;    // 上端
 	};
 
+
+
 public:
 	/// <summary>
 	/// 初期化
@@ -48,6 +50,8 @@ public:
 		movableArea_.right = areaEnd.x;
 	}
 
+	void OnShake();
+
 private:
 
 	// カメラ
@@ -64,6 +68,12 @@ private:
 	// カメラの目標座標
 	Vector3 destinationCamera_;
 
+	// シェイク
+	float px = 4.0f;
+	Vector3 shake_;
+	int frame = 0;
+	bool isShake_;
+
 	// 座標補完割合
 	static inline const float kInterpolationRate = 1.0f;
 
@@ -72,4 +82,7 @@ private:
 
 	// 追従対象へのカメラ移動範囲
 	static inline const Rect movingMargin = { -20.0f, 20.0f, -20.0f, 20.0f };
+
+	float shakeTimer_ = 0.0f;
+	static inline const float maxShakeTime = 0.5f;
 };

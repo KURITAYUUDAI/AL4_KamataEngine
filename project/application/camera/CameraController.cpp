@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "myMath.h"
 #include <algorithm>
+#include "SeedManager.h"
 
 void CameraController::Initialize() 
 { 
@@ -49,7 +50,32 @@ void CameraController::Update()
 	//camera_.translation_.x = std::clamp(camera_.translation_.x, minX, maxX);
 	//camera_.translation_.y = std::clamp(camera_.translation_.y, minY, maxY);
 
+	if (isShake_)
+	{
+		px = -0.35f * float(frame) + 4.0f;
+		if (px <= 0) 
+		{
+			isShake_ = false;
+			shake_ = {0.0f, 0.0f, 0.0f};
+			frame = 0;
+		} 
+		else 
+		{
+			frame++;
+			shake_.x = SeedManager::GetInstance()->GenerateFloat(-px, px);
+			shake_.y = SeedManager::GetInstance()->GenerateFloat(-px, px);
+			shake_.z = 0.0f;
+		}
+	}
+	
+
 	camera_.translation_ = {0.0f, 0.0f, -20.0f};
+
+	if (isShake_)
+	{
+		camera_.translation_ = Vector3{0.0f, 0.0f, -20.0f} + shake_;
+	}
+
 
 	// 行列を更新する
 	camera_.UpdateMatrix();
@@ -65,4 +91,9 @@ void CameraController::Reset()
 
 	// 追従対象とオフセットからカメラの座標を計算
 	camera_.translation_ = target_ + targetOffset_;
+}
+
+void CameraController::OnShake() 
+{
+	isShake_ = true;
 }

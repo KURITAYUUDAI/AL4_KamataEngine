@@ -64,7 +64,7 @@ private:
 
 	float time_;
 
-	const float kMaxTime = 90.0f;
+	const float kMaxTime = 15.0f;
 
 	std::array<int, 3> timeDigits_ {};
 	

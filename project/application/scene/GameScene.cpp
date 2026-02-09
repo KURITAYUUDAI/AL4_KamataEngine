@@ -879,6 +879,7 @@ void GameScene::CheckAllCollisions() {
 				player_->OnCollision(bullet);
 				// 敵弾の衝突時関数を呼び出す
 				bullet->OnCollision(player_);
+				cameraController_->OnShake();
 			}
 		}
 	}
